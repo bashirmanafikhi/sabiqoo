@@ -1,27 +1,21 @@
-# Illustrations
+# Illustrations (custom SVG)
 
-All hand-illustrated assets for Sabiqoo live in this folder. Anything that ships visually **must** comply with [`/STYLE.md`](../../STYLE.md).
+Hand-authored SVG assets live here. They are the **exception**, not the rule — see [`/STYLE.md`](../../STYLE.md) §4. The vast majority of UI visuals should be expressed with `@expo/vector-icons` icons.
 
-## Layout
+## What's here
 
-| Folder | Contents |
-|---|---|
-| `nodes/` | 5 roadmap `Node` states: locked, available, completed, mastered, skipped |
-| `trophies/` | Gold, silver, bronze reward trophies |
-| `badges/` | Category-completion badges (one per category, 7 total) |
-| `ornaments/` | Islamic geometric decoration — rosette, crescent + star, border tile |
-| `confetti/` | `burst.svg` (static fallback) + `confetti.json` (Lottie, expected) |
-| `units/` | One illustration per unit (8 total) — to be commissioned |
-| `empty-states/` | Empty-state illustrations for each list screen |
+| Folder | Contents | Why custom SVG |
+|---|---|---|
+| `nodes/` | 5 roadmap node states (locked, available, completed, mastered, skipped) | No icon-library equivalent |
+| `trophies/` | Gold, silver, bronze reward trophies | Distinct color treatments need more than one icon |
+| `confetti/` | `burst.svg` (static) + expected `confetti.json` (Lottie) | Animation + 12-particle burst |
 
-## What we don't draw
+## What we explicitly do NOT have
 
-No characters (human, animal, or fantasy). Decoration is carried entirely by the Islamic ornament layer and node-state SVGs. If a mascot is ever added in v2 it must be commissioned from a designer — see `STYLE.md` §9.
+- Mascots / characters / creatures.
+- Custom decorative ornaments / frame art.
+- Unit illustrations (composed from icons instead).
 
 ## Naming
 
-`{concept}.svg` — kebab-case, no version suffix. Re-export revisions through git history, not filenames.
-
-## Sizing
-
-Each SVG carries an explicit `viewBox` and `width`/`height`. Default size is 80×80 for icons; scale via CSS or props.
+`{concept}.svg` — kebab-case, no version suffix. Re-export revisions through git, not filenames.
