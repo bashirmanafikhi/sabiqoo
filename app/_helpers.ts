@@ -99,46 +99,67 @@ export function computeUnlockedIds(
   logCounts: Record<number, number>,
   skippedIds: number[],
 ): Set<number> {
+  // Sets for O(1) lookups
   const completed = new Set(
     Object.entries(logCounts)
       .filter(([, c]) => (c ?? 0) > 0)
       .map(([id]) => Number(id)),
   );
   const skipped = new Set(skippedIds);
-  const out = new Set<number>();
-  const deedsByUnit = new Map<number, Deed[]>();
+
+  // Group deeds by unit, sorted by sort_order
+  const byUnit = new Map<number, Deed[]>();
   for (const d of deeds) {
-    const arr = deedsByUnit.get(d.unitId) ?? [];
+    const arr = byUnit.get(d.unitId) ?? [];
     arr.push(d);
-    deedsByUnit.set(d.unitId, arr);
+    byUnit.set(d.unitId, arr);
   }
-  const categoryTotal = new Map<number, number>();
-  const categoryDone = new Map<number, number>();
-  for (const d of deeds) {
-    categoryTotal.set(
-      d.categoryId,
-      (categoryTotal.get(d.categoryId) ?? 0) + 1,
-    );
-    if (completed.has(d.id)) {
-      categoryDone.set(
-        d.categoryId,
-        (categoryDone.get(d.categoryId) ?? 0) + 1,
+  for (const arr of byUnit.values()) arr.sort((a, b) => a.sortOrder - b.sortOrder);
+
+  const unlocked = new Set<number>();
+
+  for (const [unitId, arr] of byUnit) {
+    // Within the unit, sort by sort_order. Track the highest sort_order whose
+    // (a) preceding deed has been completed OR
+    // (b) any branch-alternative sibling (same branch_group) with lower
+    //     sort_order has been completed.
+    // A deed is unlocked if its sort_order <= frontier, OR the predecessor
+    // condition holds. Skipped deeds never unlock and never count as
+    // completion of the frontier.
+    let frontier = 0;
+    for (const d of arr) {
+      const sortOrder = d.sortOrder;
+      if (skipped.has(d.id)) continue;
+
+      // First deed in the unit is always unlocked (entry-point per unit).
+      if (sortOrder === 1) {
+        unlocked.add(d.id);
+        if (completed.has(d.id)) {
+          frontier = sortOrder;
+        }
+        continue;
+      }
+
+      // The deed is unlocked if EITHER:
+      //   (a) any same-unit deed with sort_order < sortOrder has been
+      //       completed (and not skipped), OR
+      //   (b) any same-unit, same-branch-group deed with sort_order <
+      //       sortOrder has been completed (alt-branch semantics).
+      const predecessors = arr.filter(
+        x => x.sortOrder < sortOrder && !skipped.has(x.id),
       );
+      const linearGate = predecessors.some(p => completed.has(p.id));
+      const branchGate = predecessors.some(
+        p => p.branchGroup === d.branchGroup && completed.has(p.id),
+      );
+      if (linearGate || branchGate) {
+        unlocked.add(d.id);
+      }
+      if (completed.has(d.id)) {
+        frontier = Math.max(frontier, sortOrder);
+      }
     }
   }
-  for (const d of deeds) {
-    if (skipped.has(d.id)) continue;
-    if (d.difficultyLevel === 1) {
-      const peers = (deedsByUnit.get(d.unitId) ?? []).filter(
-        x => x.id !== d.id && x.difficultyLevel === 1,
-      );
-      if (peers.some(p => completed.has(p.id))) out.add(d.id);
-    } else {
-      const total = categoryTotal.get(d.categoryId) ?? 0;
-      const done = categoryDone.get(d.categoryId) ?? 0;
-      const ratio = total > 0 ? done / total : 0;
-      if (ratio >= 1 / 3) out.add(d.id);
-    }
-  }
-  return out;
+
+  return unlocked;
 }

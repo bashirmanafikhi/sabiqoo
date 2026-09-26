@@ -29,7 +29,7 @@ import {
   unitTitleFor,
   computeUnlockedIds,
   type Locale,
-} from './_helpers';
+} from '../_helpers';
 
 interface UnitRow {
   unit: Unit;
