@@ -1,7 +1,7 @@
 import * as SQLite from 'expo-sqlite';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import * as schema from './schema';
-import { runMigrationsFromFolder } from './migrations/run';
+import { bootstrapRuntimeDb } from './migrate';
 
 type SchemaDb = ReturnType<typeof drizzle<typeof schema>>;
 
@@ -14,17 +14,10 @@ export function getDb(): SchemaDb {
   return _db;
 }
 
-export async function runMigrations(): Promise<void> {
-  const db = getDb();
-  await runMigrationsFromFolder(db);
-}
-
+/**
+ * One-shot app-boot setup. Idempotent: every CREATE uses IF NOT EXISTS.
+ */
 export async function initDb(): Promise<void> {
-  try {
-    await runMigrations();
-  } catch {
-    // no-op: tables are created on demand by callers
-  }
+  const db = getDb();
+  bootstrapRuntimeDb(db);
 }
-
-export type DbClient = SchemaDb;
