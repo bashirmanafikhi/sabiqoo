@@ -127,16 +127,6 @@
 - [ ] `src/repos/skippedRepo.ts` exporting `listAll`, `isSkipped(deedId)`, `skip(deedId)`, `unSkip(deedId)`
 - [ ] Unit tests against in-memory SQLite (insert, unique-constraint, cascade delete)
 
-### P1-T15 — Circumstance metadata (tables + repo + seed)
-**DONE when** migrations apply, `circumstancesRepo.listForDeed(id)` returns tags, and 7 canonical tags are seeded with 0–3 per deed across the catalog.
-
-- [ ] Add `circumstances` and `deed_circumstances` tables to `src/db/schema.ts`
-- [ ] `drizzle-kit generate` produces `0005_add_circumstances.sql`; review and commit
-- [ ] `src/repos/circumstancesRepo.ts` exporting `listAll`, `listForDeed(deedId)`, `setForDeed(deedId, slugs[])`
-- [ ] Seed the canonical tag set in `scripts/seed.ts`: `has_income`, `has_family`, `animal_access`, `time_flexible`, `health_ok`, `literate`, `can_travel`
-- [ ] Backfill `deed_circumstances` rows so 0–3 tags per deed, biased toward 0–1 (most deeds require nothing special)
-- [ ] Unit tests against in-memory SQLite
-
 ---
 
 ## Phase 2 — Core Screens
@@ -216,14 +206,6 @@
 - [ ] Settings: new "Skipped deeds" section listing `user_skipped` rows with `Un-skip` action per row + empty-state copy
 - [ ] Optimistic update via local store + repo reconcile on next focus
 - [ ] RNTL tests: skipping renders dimmed node, un-skip restores prior state
-
-### P2-T05e — Circumstance chips on Challenge Detail
-**DONE when** Challenge Detail's `Today` tab shows a small `CircumstanceChip` row when the deed has any tags, with no chips when none.
-
-- [ ] `src/components/CircumstanceChip.tsx`; uses `skip.chipLabel` i18n key prefix
-- [ ] Hook `useCircumstances(deedId)` calling `circumstancesRepo.listForDeed`
-- [ ] Layout: horizontal `ScrollView` of chips below the hero block, before the stepper
-- [ ] RNTL snapshot for: no-tags, one-tag, three-tags; light + dark + AR/EN
 
 ### P2-T06 — Challenge Detail — `History` tab
 **DONE when** the History tab lists every prior log of that deed in reverse-chronological order.

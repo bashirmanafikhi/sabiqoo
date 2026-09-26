@@ -188,24 +188,6 @@ CREATE TABLE user_skipped (
   FOREIGN KEY (deed_id) REFERENCES deeds(id) ON DELETE CASCADE
 );
 CREATE INDEX idx_user_skipped_deed_id ON user_skipped(deed_id);
-
--- Circumstance metadata (informational chips; not enforced in v1)
-CREATE TABLE circumstances (
-  id          INTEGER PRIMARY KEY AUTOINCREMENT,
-  slug        TEXT UNIQUE NOT NULL,               -- e.g. 'has_income', 'has_family'
-  name_ar     TEXT NOT NULL,
-  name_en     TEXT NOT NULL,
-  sort_order  INTEGER NOT NULL DEFAULT 0
-);
-CREATE TABLE deed_circumstances (
-  deed_id         INTEGER NOT NULL,
-  circumstance_id INTEGER NOT NULL,
-  PRIMARY KEY (deed_id, circumstance_id),
-  FOREIGN KEY (deed_id)         REFERENCES deeds(id)        ON DELETE CASCADE,
-  FOREIGN KEY (circumstance_id) REFERENCES circumstances(id) ON DELETE CASCADE
-);
-CREATE INDEX idx_deed_circumstances_deed         ON deed_circumstances(deed_id);
-CREATE INDEX idx_deed_circumstances_circumstance ON deed_circumstances(circumstance_id);
 ```
 
 ### 4.2 Seed
@@ -213,7 +195,6 @@ CREATE INDEX idx_deed_circumstances_circumstance ON deed_circumstances(circumsta
 - **Units**: 8 seeded (Smile & Salam; Kind Words; Kinship Ties; Neighborly Acts; Kindness to Animals; Financial Charity; Sadaqah Jariyah; Hands-on Service). Roadmap groups deeds by unit so each path is ~20 deeds and one or two scrolls deep.
 - **Categories**: 7 from the PRD sample (الصدقات المالية, الأقارب والأرحام, الصدقات الجارية والأوقاف, الأعمال البدنية والتطوعية, الكلمة الطيبة والمعنوية, الرفق بالحيوان والبيئة, إغاثة وكفالة).
 - **Deeds**: ~150 entries spread across the 8 units and 7 categories (~20 deeds per category, evenly split across units). ≥ 70% tagged `difficulty_level=1` so the catalogue always surfaces easy inspiration. Bilingual fields filled for AR/EN; seed runs idempotently on first boot (`INSERT OR IGNORE` keyed by the `slug` column).
-- **Circumstances**: seeded with the canonical tag set (`has_income`, `has_family`, `animal_access`, `time_flexible`, `health_ok`, `literate`, `can_travel`); deeds carry 0–3 tags. Informational only in v1.
 
 ### 4.3 Migration management
 
@@ -251,7 +232,6 @@ app/
 - **Tabs**: `Today` (default) · `Evidence` (الدليل) · `History`.
 - **Today**:
   - Hero icon, title (localized), category badge, XP value.
-  - **Circumstance chips** (`CircumstanceChip` row, only if the deed has any tags): small pill per tag (`{# if you can spare money}` style explanation in Arabic or English), informational only.
   - Quantity stepper (`-`, value, `+`; min 1, max 50).
   - Optional `note` textarea.
   - Big 3D `Mark Completed` button (full-width, brand green).
@@ -309,7 +289,6 @@ app/
 | `ProgressBadge` | `x/y` indicator (catalog chips, category cards, unit headers) | `done`, `total`, `locale`, `compact?` |
 | `UnitProgress` | Aggregate progress bar across all deeds in a unit, used on Roadmap headers | `unitId` |
 | `SkipToggle` | "Not for me" toggle (outline ↔ filled eye-slash), used on `Node`, `DeedCard`, and Detail header | `deedId`, `size` |
-| `CircumstanceChip` | Small pill showing one circumstance tag (informational) | `tag`, `locale` |
 | `StreakBadge` | 🔥 + N | `streak`, `freezesLeft` |
 | `XpBar` | Progress to next level | `xp`, `level` |
 | `ConfettiOverlay` | Reanimated + Lottie celebration | `visible`, `xpEarned`, `onDone` |
@@ -388,7 +367,6 @@ xpForLevel(1) = 100, xpForLevel(2) = 300, xpForLevel(3) = 600, …
     "skip.undoToggle":      { "ar": "إلغاء التخطي", "en": "Un-skip" },
     "skip.sectionTitle":    { "ar": "الأعمال التي تخطيتها", "en": "Skipped deeds" },
     "skip.sectionEmpty":    { "ar": "لم تتخطَّ أي عمل بعد.", "en": "You haven't skipped any deeds yet." },
-    "skip.chipLabel":       { "ar": "يتطلب:", "en": "Requires:" },
     "skip.lockedHint":      { "ar": "هذا العمل لا يناسبك، يمكنك العودة إليه متى ما استطعت.", "en": "This deed isn't right for you. You can come back to it anytime." }
   }
   ```
@@ -457,7 +435,7 @@ sabiqoo/
 │   ├── db/                   # drizzle schema + migrations
 │   │   ├── schema.ts
 │   │   └── migrations/
-│   ├── repos/                # deedsRepo, logsRepo, profileRepo, unitsRepo, bookmarksRepo, skippedRepo, circumstancesRepo
+│   ├── repos/                # deedsRepo, logsRepo, profileRepo, unitsRepo, bookmarksRepo, skippedRepo
 │   ├── stores/               # zustand: themeStore, localeStore, profileStore
 │   ├── gamification/         # xp.ts, level.ts, streak.ts (pure functions)
 │   ├── i18n/
