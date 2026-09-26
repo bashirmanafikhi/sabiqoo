@@ -7,7 +7,7 @@
 
 ## 1. Brand at a glance
 
-- **Inspiration**: Duolingo flat geometry (pre-2018) + Islamic geometric simplicity.
+- **Inspiration**: Duolingo flat geometry (pre-2018) + Islamic geometric ornament.
 - **Voice**: friendly, chunky, optimistic, never cynical.
 - **Goal**: zero ambiguity on a phone screen at a glance.
 
@@ -74,20 +74,40 @@ assets/illustrations/
   nodes/            # 5 SVG files: locked, available, completed, mastered, skipped
   trophies/         # gold.svg, silver.svg, bronze.svg
   badges/           # mastery, streak, kindness — 6+ SVGs
-  mascot/           # character.svg, heart.svg, sparkle.svg
+  ornaments/        # 8-point rosette, crescent + star, border tile — Islamic motifs
   confetti/         # burst.svg (static), confetti.json (lottie)
   units/            # 8 unit illustrations, ~PNG-export-from-SVG
   empty-states/     # empty-bookmarks.svg, empty-history.svg, …
 ```
 
-## 8. Reference inspiration
+## 8. Islamic ornament layer
+
+In place of characters/mascots, ornamental structure carries the visual identity:
+
+- **Rosette** (`ornaments/rosette.svg`) — the canonical 8-point star, double-layered (outer `brand-green`, inner `paper`, center `accent-fire`). Reuse as: completion-frame, empty-state hero, unit-divider glyph.
+- **Crescent + star** (`ornaments/crescent-star.svg`) — celebration mark. Reuse as: the celebration overlay's "you did it" emblem (replaces mascot role), header accent on Eid / Friday themed content.
+- **Border tile** (`ornaments/border-pattern.svg`) — repeating 8-point stars + diamonds. Reuse as: top/bottom ribbon on Roadmap headers, frame for the Celebrate overlay, dividers between units.
+- **Construction rules**:
+  - Always build rosettes from a base circle + nested 8-point stars (outer R, inner 0.55·R, center dot).
+  - Use `accent-gold` for crescent fills (not `brand-blue`) so it harmonises with completed nodes.
+  - Border tile must be horizontally tileable at integer multiples of 60px.
+- **Where they appear**: Roadmap header strip, unit dividers, celebration overlay frame, empty states. Never as a pressed button background.
+
+## 9. No characters rule (v1)
+
+- No human, animal, or fantasy-creature illustrations.
+- This rule is both a stylistic choice (we lean into Islamic geometry) and a craft choice (avoids low-quality mascot output).
+- If we ever want a mascot in v2, it must be commissioned from a designer — never auto-generated.
+
+## 10. Reference inspiration
 
 - Duolingo (2016–2019 era flat style).
 - Headspace illustration system.
-- Apple Memoji proportions (for the mascot face layout).
 - Storyset / unDraw (clean, intentional, not detailed).
+- Islamic geometric art references (Khatim, Andalusian tile patterns, Ottoman rosettes).
+- The Met Open Access — Department of Islamic Art (public-domain motifs).
 
-## 9. Iteration rule
+## 11. Iteration rule
 
 Every illustrated asset is reviewable. If a hand-off feedback round
 takes more than 15 minutes of author time, the asset was probably out

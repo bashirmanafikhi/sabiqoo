@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 40" width="240" height="40" role="img" aria-label="Islamic geometric border tile">
+  <rect width="240" height="40" fill="#FFFFFF"/>
+  <g stroke="#1F1F1F" stroke-width="1.5" stroke-linejoin="round">
+    <!-- repeating 8-point star + diamond pattern -->
+    <g transform="translate(20 20)">
+      <path d="M16 0 L5.55 2.3 L11.31 11.31 L2.3 5.55 L0 16 L-2.3 5.55 L-11.31 11.31 L-5.55 2.3 L-16 0 L-5.55 -2.3 L-11.31 -11.31 L-2.3 -5.55 L0 -16 L2.3 -5.55 L11.31 -11.31 L5.55 -2.3 Z"
+            fill="#58CC02"/>
+    </g>
+    <line x1="40" y1="20" x2="60" y2="20"/>
+    <g transform="translate(80 20)">
+      <path d="M16 0 L5.55 2.3 L11.31 11.31 L2.3 5.55 L0 16 L-2.3 5.55 L-11.31 11.31 L-5.55 2.3 L-16 0 L-5.55 -2.3 L-11.31 -11.31 L-2.3 -5.55 L0 -16 L2.3 -5.55 L11.31 -11.31 L5.55 -2.3 Z"
+            fill="#FFC800"/>
+    </g>
+    <line x1="100" y1="20" x2="120" y2="20"/>
+    <g transform="translate(140 20)">
+      <path d="M16 0 L5.55 2.3 L11.31 11.31 L2.3 5.55 L0 16 L-2.3 5.55 L-11.31 11.31 L-5.55 2.3 L-16 0 L-5.55 -2.3 L-11.31 -11.31 L-2.3 -5.55 L0 -16 L2.3 -5.55 L11.31 -11.31 L5.55 -2.3 Z"
+            fill="#58CC02"/>
+    </g>
+    <line x1="160" y1="20" x2="180" y2="20"/>
+    <g transform="translate(200 20)">
+      <path d="M16 0 L5.55 2.3 L11.31 11.31 L2.3 5.55 L0 16 L-2.3 5.55 L-11.31 11.31 L-5.55 2.3 L-16 0 L-5.55 -2.3 L-11.31 -11.31 L-2.3 -5.55 L0 -16 L2.3 -5.55 L11.31 -11.31 L5.55 -2.3 Z"
+            fill="#1CB0F6"/>
+    </g>
+  </g>
+</svg>
