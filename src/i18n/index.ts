@@ -1,3 +1,4 @@
+import 'intl-pluralrules';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import * as Localization from 'expo-localization';
@@ -24,6 +25,7 @@ export async function initI18n() {
     fallbackLng: 'ar',
     interpolation: { escapeValue: false },
     react: { useSuspense: false },
+    compatibilityJSON: 'v4',
   });
   return i18n;
 }
