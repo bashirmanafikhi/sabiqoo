@@ -155,21 +155,19 @@ export default function CatalogScreen() {
   );
 
   const renderItem = ({ item }: ListRenderItemInfo<CatalogDeed>) => (
-    <View style={{ flex: 1, padding: 6 }}>
-      <DeedCard
-        deed={{
-          id: item.deed.id,
-          title: titleFor(item.deed, locale),
-          category_color: item.category_color,
-          xp_reward: item.xp_reward,
-          locked: item.locked,
-          bookmarked: item.bookmarked,
-        }}
-        onPress={() => router.push(`/deed/${item.deed.id}`)}
-        onToggleBookmark={() => onToggleBookmark(item.deed.id)}
-        onToggleSkip={() => onToggleSkip(item.deed.id)}
-      />
-    </View>
+    <DeedCard
+      deed={{
+        id: item.deed.id,
+        title: titleFor(item.deed, locale),
+        category_color: item.category_color,
+        xp_reward: item.xp_reward,
+        locked: item.locked,
+        bookmarked: item.bookmarked,
+      }}
+      onPress={() => router.push(`/deed/${item.deed.id}`)}
+      onToggleBookmark={() => onToggleBookmark(item.deed.id)}
+      onToggleSkip={() => onToggleSkip(item.deed.id)}
+    />
   );
 
   return (
@@ -283,8 +281,8 @@ export default function CatalogScreen() {
           data={items}
           renderItem={renderItem}
           keyExtractor={(it: CatalogDeed) => String(it.deed.id)}
-          numColumns={2}
-          contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 24 }}
+          contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 6 }}
+          ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
         />
       )}
     </View>

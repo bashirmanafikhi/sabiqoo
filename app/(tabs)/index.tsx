@@ -5,6 +5,7 @@ import {
   ScrollView,
   Text,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useFocusEffect, useRouter } from 'expo-router';
@@ -13,6 +14,7 @@ import { StreakBadge } from '@/components/StreakBadge';
 import { XpBar } from '@/components/XpBar';
 import { HeartButton } from '@/components/HeartButton';
 import { Node, type NodeState } from '@/components/Node';
+import { RoadmapPath } from '@/components/RoadmapPath';
 import { UnitProgress } from '@/components/UnitProgress';
 import { useColors } from '@/theme/tokens';
 import { useLocale } from '@/i18n/LocaleProvider';
@@ -58,6 +60,9 @@ export default function RoadmapScreen() {
   const { t, i18n } = useTranslation();
   const { locale, setLocale } = useLocale();
   const activeLocale: Locale = locale ?? pickLocale(i18n.language);
+  const { width: windowWidth } = useWindowDimensions();
+  // Unit card outer margin is 16 each side; inner padding is also 16 each side.
+  const roadmapWidth = Math.max(0, windowWidth - 32 - 32);
 
   const [units, setUnits] = useState<Unit[]>([]);
   const [deeds, setDeeds] = useState<Deed[]>([]);
@@ -252,38 +257,12 @@ export default function RoadmapScreen() {
         locale={activeLocale}
       />
       <View style={{ marginTop: 16 }}>
-        {row.deeds.map((deed, idx) => {
-          const state = stateFor(deed.id, skippedIds, logCounts, unlockedIds);
-          const alignEnd = idx % 2 === 1;
-          return (
-            <View key={deed.id} style={{ marginVertical: 6 }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: alignEnd ? 'flex-end' : 'flex-start',
-                }}
-              >
-                <Node
-                  state={state}
-                  deedId={deed.id}
-                  onPress={() => router.push(`/deed/${deed.id}`)}
-                />
-              </View>
-              {idx < row.deeds.length - 1 ? (
-                <View
-                  pointerEvents="none"
-                  style={{
-                    height: 2,
-                    alignSelf: alignEnd ? 'flex-end' : 'flex-start',
-                    width: 28,
-                    backgroundColor: colors.border,
-                    marginVertical: 4,
-                  }}
-                />
-              ) : null}
-            </View>
-          );
-        })}
+        <RoadmapPath
+          deeds={row.deeds}
+          stateFor={id => stateFor(id, skippedIds, logCounts, unlockedIds)}
+          containerWidth={roadmapWidth}
+          onPressDeed={id => router.push(`/deed/${id}`)}
+        />
       </View>
     </View>
   );
