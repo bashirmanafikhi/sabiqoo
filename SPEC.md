@@ -8,7 +8,7 @@
 ## 1. Product Philosophy
 
 - **Name**: **سابقوا (Sabiqoo)** — from the Qur'anic imperative _"فَاسْتَبِقُوا الْخَيْرَٰتِ"_.
-- **Core promise**: 50+ acts of charity broken into bite-size, repeatable challenges with a friction-free 3D-Duolingo UI.
+- **Core promise**: ~150 acts of charity broken into bite-size, repeatable challenges with a friction-free 3D-Duolingo UI, organized as a living inspiration library — heavily weighted toward easy deeds so every user always has something actionable in mind.
 - **Privacy & Offline-First**: 100% local tracking via `expo-sqlite`; no mandatory cloud. Optional cloud export is explicitly out-of-scope for v1.
 - **Localization**: Arabic (default, RTL) + English (LTR). All strings addressable via i18n keys.
 - **Theming**: Light / Dark / System with semantic color tokens; no hard-coded hexes in components.
@@ -170,13 +170,50 @@ CREATE TABLE deed_references (
   FOREIGN KEY (deed_id) REFERENCES deeds(id) ON DELETE CASCADE
 );
 CREATE INDEX idx_deed_references_deed_id ON deed_references(deed_id);
+
+-- User bookmarks ("My List") — optional, many deeds per local user
+CREATE TABLE user_bookmarks (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  deed_id     INTEGER NOT NULL UNIQUE,             -- a deed bookmarked at most once
+  created_at  TEXT NOT NULL DEFAULT (datetime('now')),
+  FOREIGN KEY (deed_id) REFERENCES deeds(id) ON DELETE CASCADE
+);
+CREATE INDEX idx_user_bookmarks_deed_id ON user_bookmarks(deed_id);
+
+-- User-skipped deeds ("Not for me") — never gates progression
+CREATE TABLE user_skipped (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  deed_id     INTEGER NOT NULL UNIQUE,
+  skipped_at  TEXT NOT NULL DEFAULT (datetime('now')),
+  FOREIGN KEY (deed_id) REFERENCES deeds(id) ON DELETE CASCADE
+);
+CREATE INDEX idx_user_skipped_deed_id ON user_skipped(deed_id);
+
+-- Circumstance metadata (informational chips; not enforced in v1)
+CREATE TABLE circumstances (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  slug        TEXT UNIQUE NOT NULL,               -- e.g. 'has_income', 'has_family'
+  name_ar     TEXT NOT NULL,
+  name_en     TEXT NOT NULL,
+  sort_order  INTEGER NOT NULL DEFAULT 0
+);
+CREATE TABLE deed_circumstances (
+  deed_id         INTEGER NOT NULL,
+  circumstance_id INTEGER NOT NULL,
+  PRIMARY KEY (deed_id, circumstance_id),
+  FOREIGN KEY (deed_id)         REFERENCES deeds(id)        ON DELETE CASCADE,
+  FOREIGN KEY (circumstance_id) REFERENCES circumstances(id) ON DELETE CASCADE
+);
+CREATE INDEX idx_deed_circumstances_deed         ON deed_circumstances(deed_id);
+CREATE INDEX idx_deed_circumstances_circumstance ON deed_circumstances(circumstance_id);
 ```
 
 ### 4.2 Seed
 
-- **Units**: 3 seeded initially (Unit 1: Everyday Smiles & Kindness, Unit 2: Kinship & Family Ties, Unit 3: Continuous & Community). The PRD references more units; expand as content grows.
+- **Units**: 8 seeded (Smile & Salam; Kind Words; Kinship Ties; Neighborly Acts; Kindness to Animals; Financial Charity; Sadaqah Jariyah; Hands-on Service). Roadmap groups deeds by unit so each path is ~20 deeds and one or two scrolls deep.
 - **Categories**: 7 from the PRD sample (الصدقات المالية, الأقارب والأرحام, الصدقات الجارية والأوقاف, الأعمال البدنية والتطوعية, الكلمة الطيبة والمعنوية, الرفق بالحيوان والبيئة, إغاثة وكفالة).
-- **Deeds**: ~50 entries spread across the 7 categories, bilingual fields filled in for both AR and EN. Seed runs idempotently on first boot (`INSERT OR IGNORE` keyed by the `slug` column).
+- **Deeds**: ~150 entries spread across the 8 units and 7 categories (~20 deeds per category, evenly split across units). ≥ 70% tagged `difficulty_level=1` so the catalogue always surfaces easy inspiration. Bilingual fields filled for AR/EN; seed runs idempotently on first boot (`INSERT OR IGNORE` keyed by the `slug` column).
+- **Circumstances**: seeded with the canonical tag set (`has_income`, `has_family`, `animal_access`, `time_flexible`, `health_ok`, `literate`, `can_travel`); deeds carry 0–3 tags. Informational only in v1.
 
 ### 4.3 Migration management
 
@@ -194,6 +231,7 @@ app/
   index.tsx                // Roadmap (Home)
   deed/[id].tsx            // Challenge Detail (tabs)
   catalog/index.tsx        // Catalog (search + category chips)
+  bookmarks/index.tsx      // My List — saved deeds
   history/index.tsx        // History + analytics
   settings/index.tsx       // Theme, language, streak-freeze use
   +not-found.tsx
@@ -201,16 +239,19 @@ app/
 
 ### 5.1 Roadmap (Home)
 
-- **Header**: streak chip (🔥), XP/Level pill, language toggle, settings cog.
-- **Body**: vertical scroller; per unit, a header card + a serpentine `RoadmapPath` with `Node`s.
-- **Branching**: nodes whose `branch_group` differs render side-by-side; tapping either advances `branch_group` progress and unlocks the next merged node.
-- **Node states**: `Locked` (gray, `lock` icon, disabled), `Available` (pulsing brand color), `Completed` (gold star), `Mastered` (gold star + flame when `user_logs` row count for deed ≥ 10).
+- **Header**: streak chip (🔥), XP/Level pill, bookmarks icon (heart with numeric badge if any), language toggle, settings cog.
+- **Body**: vertical scroller across 8 units; per unit, a header card (with `UnitProgress` bar showing `x/y` deeds in this unit ever completed) + a serpentine `RoadmapPath` with `Node`s.
+- **Branching semantics**: nodes in the same `branch_group` render as **alternative paths** (e.g., financial vs non-monetary). A merge node unlocks as soon as **any one side** of the branch has its last deed completed — users can skip/bypass the branches that don't fit their circumstances without stalling overall roadmap progress. A user can also manually skip any single deed via the Not-for-me gesture (see §6 `SkipToggle`).
+- **Node states**: `Locked` (gray, `lock` icon, disabled), `Available` (pulsing brand color), `Completed` (gold star), `Mastered` (gold star + flame when `user_logs` row count for deed ≥ 10), `Skipped` (dimmed, slate-blue with an eye-with-slash icon; never gates progression, computable again on un-skip).
+- **`Node` gestures**: heart icon (bookmark toggle) and skip-icon toggle overlay each node; tap either without opening detail (haptic `selection`). Skipped deeds stay visible on the roadmap so users remember what they excluded.
 
 ### 5.2 Challenge Detail (`/deed/[id]`)
 
+- **Header**: back arrow, deed title, bookmark heart toggle (filled when bookmarked, outline otherwise), skip toggle (filled when in `user_skipped`).
 - **Tabs**: `Today` (default) · `Evidence` (الدليل) · `History`.
 - **Today**:
   - Hero icon, title (localized), category badge, XP value.
+  - **Circumstance chips** (`CircumstanceChip` row, only if the deed has any tags): small pill per tag (`{# if you can spare money}` style explanation in Arabic or English), informational only.
   - Quantity stepper (`-`, value, `+`; min 1, max 50).
   - Optional `note` textarea.
   - Big 3D `Mark Completed` button (full-width, brand green).
@@ -221,20 +262,34 @@ app/
 ### 5.3 Catalog
 
 - Search bar (matches localized title + description).
-- Horizontal `CategoryChips` for filtering.
-- Vertical grid of `DeedCard`s (title, category color stripe, XP, lock if not yet unlocked).
+- Horizontal `CategoryChips` for filtering — each chip shows a small `x/y` indicator in muted text.
+- Vertical grid of `DeedCard`s (title, category color stripe, XP, lock if not yet unlocked, heart icon for bookmark toggle).
+- Each **`CategoryCard`** (clicking a chip filters to that category OR is shown at the top of the catalog grid) carries:
+  - Title (localized).
+  - **Progress badge** in top-right: `x/y` formatted with the active locale (Arabic numerals when AR).
+  - **Progress bar** below the title; fill ratio = `x/y`, `accent-gold` when complete.
+  - **Trophy overlay** when `x == y` (visual only — no extra XP), distinct from per-deed `Mastered`.
 
-### 5.4 History
+### 5.4 Bookmarks ("My List")
+
+- Reached via the heart icon in the Roadmap top bar (with numeric badge showing `n` saved) and via the back-stack from a deed's heart toggle.
+- Vertical list of `DeedCard`s the user has bookmarked, ordered by `user_bookmarks.created_at` descending (most recently saved first).
+- Each row: localized title, category color stripe, XP, bookmarked-since date, quick "Mark Completed" `BigButton3D` (mini variant).
+- **Empty state**: friendly copy + illustration + CTA "Browse the catalog".
+- Pull-to-refresh is unnecessary (live updates); the list re-fetches on focus.
+
+### 5.5 History
 
 - Activity heatmap (last 30 days) — `bg-intensity` from log count.
 - Category donut (counts grouped by category).
 - List of all logs reverse chronological.
 
-### 5.5 Settings
+### 5.6 Settings
 
 - Theme picker (`System` / `Light` / `Dark`).
 - Language picker (`العربية` / `English`).
 - Streak-freeze badge + manual consume button (consume yesterday's miss for free).
+- **Skipped deeds** list with `Un-skip` action for each entry.
 - About + version.
 
 ---
@@ -250,6 +305,11 @@ app/
 | `DeedCard` | Catalog entry | `deed`, `locked`, `onPress` |
 | `LogRow` | One entry in history | `log`, `deed`, `locale` |
 | `ReferenceCard` | One ayah / hadith / athkar reference in the Evidence tab | `reference`, `locale` |
+| `HeartButton` | Bookmark toggle (outline ↔ filled), used on `DeedCard`, `Node`, and Detail header | `deedId`, `size`, `withBadge?` |
+| `ProgressBadge` | `x/y` indicator (catalog chips, category cards, unit headers) | `done`, `total`, `locale`, `compact?` |
+| `UnitProgress` | Aggregate progress bar across all deeds in a unit, used on Roadmap headers | `unitId` |
+| `SkipToggle` | "Not for me" toggle (outline ↔ filled eye-slash), used on `Node`, `DeedCard`, and Detail header | `deedId`, `size` |
+| `CircumstanceChip` | Small pill showing one circumstance tag (informational) | `tag`, `locale` |
 | `StreakBadge` | 🔥 + N | `streak`, `freezesLeft` |
 | `XpBar` | Progress to next level | `xp`, `level` |
 | `ConfettiOverlay` | Reanimated + Lottie celebration | `visible`, `xpEarned`, `onDone` |
@@ -315,7 +375,21 @@ xpForLevel(1) = 100, xpForLevel(2) = 300, xpForLevel(3) = 600, …
     "deed.reference.hadith": { "ar": "حديث شريف",   "en": "Hadith" },
     "deed.reference.athkar": { "ar": "أذكار",        "en": "Athkar" },
     "deed.reference.lesson": { "ar": "الدرس:",       "en": "Lesson:" },
-    "deed.reference.empty":  { "ar": "لا يوجد دليل شرعي لهذا العمل بعد.", "en": "No religious evidence has been added for this deed yet." }
+    "deed.reference.empty":  { "ar": "لا يوجد دليل شرعي لهذا العمل بعد.", "en": "No religious evidence has been added for this deed yet." },
+    "bookmarks.title":       { "ar": "قائمتي",       "en": "My List" },
+    "bookmarks.empty":       { "ar": "لم تحفظ أي عمل بعد. تصفح الكتالوج وأضف ما يلهمك.", "en": "You haven't saved any deeds yet. Browse the catalog and add what inspires you." },
+    "bookmarks.emptyCta":    { "ar": "تصفح الكتالوج", "en": "Browse the catalog" },
+    "bookmarks.added":       { "ar": "أضيف إلى قائمتي", "en": "Added to your list" },
+    "bookmarks.removed":     { "ar": "أزيل من قائمتي", "en": "Removed from your list" },
+    "bookmarks.count":       { "ar": "{{count}} محفوظ", "en": "{{count}} saved" },
+    "progress.label":        { "ar": "{{done}} من {{total}}", "en": "{{done}} of {{total}}" },
+    "category.completed":    { "ar": "اكتمل هذا الصنف!", "en": "Category complete!" },
+    "skip.toggle":          { "ar": "غير مناسب لي", "en": "Not for me" },
+    "skip.undoToggle":      { "ar": "إلغاء التخطي", "en": "Un-skip" },
+    "skip.sectionTitle":    { "ar": "الأعمال التي تخطيتها", "en": "Skipped deeds" },
+    "skip.sectionEmpty":    { "ar": "لم تتخطَّ أي عمل بعد.", "en": "You haven't skipped any deeds yet." },
+    "skip.chipLabel":       { "ar": "يتطلب:", "en": "Requires:" },
+    "skip.lockedHint":      { "ar": "هذا العمل لا يناسبك، يمكنك العودة إليه متى ما استطعت.", "en": "This deed isn't right for you. You can come back to it anytime." }
   }
   ```
 
@@ -383,7 +457,7 @@ sabiqoo/
 │   ├── db/                   # drizzle schema + migrations
 │   │   ├── schema.ts
 │   │   └── migrations/
-│   ├── repos/                # deedsRepo, logsRepo, profileRepo, unitsRepo
+│   ├── repos/                # deedsRepo, logsRepo, profileRepo, unitsRepo, bookmarksRepo, skippedRepo, circumstancesRepo
 │   ├── stores/               # zustand: themeStore, localeStore, profileStore
 │   ├── gamification/         # xp.ts, level.ts, streak.ts (pure functions)
 │   ├── i18n/

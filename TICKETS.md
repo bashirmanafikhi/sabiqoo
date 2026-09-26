@@ -63,13 +63,15 @@
 - [ ] Generate first migration; verify SQL matches SPEC §4.1
 - [ ] Apply migration on app boot via a one-shot `runMigrations()` helper inside `app/_layout.tsx`
 
-### P1-T07 — Seed data (7 categories + ~50 deeds)
-**DONE when** fresh DB contains 7 categories and ≥ 50 deeds spanning all 7 categories.
+### P1-T07 — Seed data (7 categories + 8 units + ~150 deeds)
+**DONE when** fresh DB contains 7 categories, 8 units, ≥ 150 deeds spanning all categories, and ≥ 70% of deeds tagged `difficulty_level = 1`.
 
-- [ ] `scripts/seed.ts` inserting categories + units + deeds via `INSERT OR IGNORE` keyed by `slug`
+- [ ] `scripts/seed.ts` inserting units + categories + deeds via `INSERT OR IGNORE` keyed by `slug`
+- [ ] Seed the 8 units per SPEC §4.2 (Smile & Salam, Kind Words, Kinship Ties, Neighborly Acts, Kindness to Animals, Financial Charity, Sadaqah Jariyah, Hands-on Service)
 - [ ] Translate the PRD's 30 example deeds into the bilingual `title_ar`/`title_en`/`description_ar`/`description_en` shape
-- [ ] Top up to ≥ 50 by drafting 20+ more entries, balanced across categories
-- [ ] `unit_id` and `branch_group` assigned such that roadmap groups are well-balanced
+- [ ] Author ~120 additional deeds balanced across the 7 categories (~20 per category)
+- [ ] `unit_id` and `branch_group` assigned such that roadmap groups are well-balanced and branches are meaningful (e.g., Financial Charity unit has parallel financial vs non-monetary branches)
+- [ ] ≥ 70% of deeds tagged `difficulty_level = 1`
 
 ### P1-T08 — Repos layer
 **DONE when** `deedsRepo.listByUnit(unitId)` returns typed `Deed[]` from SQLite.
@@ -108,6 +110,33 @@
 - [ ] Stub `app/index.tsx` rendering a placeholder roadmap list (real impl in Phase 2)
 - [ ] `eas build --profile preview` produces a working APK
 
+### P1-T13 — `user_bookmarks` table + repo
+**DONE when** migration `0003_add_user_bookmarks.sql` applies cleanly and `bookmarksRepo.isBookmarked/listAll/add/remove` round-trip via in-memory SQLite.
+
+- [ ] Add `user_bookmarks` table to `src/db/schema.ts` (per SPEC §4.1)
+- [ ] `drizzle-kit generate` produces `0003_add_user_bookmarks.sql`; review and commit
+- [ ] `src/repos/bookmarksRepo.ts` exporting `listAll`, `isBookmarked(deedId)`, `add(deedId)`, `remove(deedId)`
+- [ ] Unit tests against in-memory SQLite (insert, unique-constraint, cascade delete, idempotent re-add becomes no-op via `INSERT OR IGNORE`)
+- [ ] Add `bookmarksRepo` to repos barrel export
+
+### P1-T14 — `user_skipped` table + repo
+**DONE when** migration `0004_add_user_skipped.sql` applies cleanly and `skippedRepo` round-trips.
+
+- [ ] Add `user_skipped` table to `src/db/schema.ts` (per SPEC §4.1)
+- [ ] `drizzle-kit generate` produces `0004_add_user_skipped.sql`; review and commit
+- [ ] `src/repos/skippedRepo.ts` exporting `listAll`, `isSkipped(deedId)`, `skip(deedId)`, `unSkip(deedId)`
+- [ ] Unit tests against in-memory SQLite (insert, unique-constraint, cascade delete)
+
+### P1-T15 — Circumstance metadata (tables + repo + seed)
+**DONE when** migrations apply, `circumstancesRepo.listForDeed(id)` returns tags, and 7 canonical tags are seeded with 0–3 per deed across the catalog.
+
+- [ ] Add `circumstances` and `deed_circumstances` tables to `src/db/schema.ts`
+- [ ] `drizzle-kit generate` produces `0005_add_circumstances.sql`; review and commit
+- [ ] `src/repos/circumstancesRepo.ts` exporting `listAll`, `listForDeed(deedId)`, `setForDeed(deedId, slugs[])`
+- [ ] Seed the canonical tag set in `scripts/seed.ts`: `has_income`, `has_family`, `animal_access`, `time_flexible`, `health_ok`, `literate`, `can_travel`
+- [ ] Backfill `deed_circumstances` rows so 0–3 tags per deed, biased toward 0–1 (most deeds require nothing special)
+- [ ] Unit tests against in-memory SQLite
+
 ---
 
 ## Phase 2 — Core Screens
@@ -136,12 +165,14 @@
 - [ ] Compose `RoadmapPath` per unit; respect user unlock state (deed.unlocked_by dependency graph from JSON in repo, or simple linear-with-branch)
 - [ ] Top bar with `<StreakBadge>` and `<XpBar>`
 
-### P2-T04 — Unlock dependency graph
-**DONE when** completing the last node of a branch unlocks the merge node.
+### P2-T04 — Unlock dependency graph (alternative-branch semantics)
+**DONE when** a merge node unlocks as soon as **any one** branch side finishes — not when all branches finish.
 
 - [ ] Define a `unlocks` relationship table or encode in seed JSON
 - [ ] Repo function `deedsRepo.unlockedIds(profile)` returning deeds the user can attempt
-- [ ] Unit tests covering branch-finish, parallel-unlock, and locked-merge cases
+- [ ] **Branch rule**: a node with `branch_group = N` is unlocked when ANY sibling in the same `branch_group` has been completed; merges with no branches follow linear predecessor rule
+- [ ] Skip interaction: if the only branching path is skipped, the merge still unlocks when at least one unskipped sibling completes (or earlier if all siblings in the branch are skipped)
+- [ ] Unit tests covering: any-side-finishes, all-branches-skipped, merge-after-single-finish, locked-merge (no branch done)
 
 ### P2-T05 — Challenge Detail — `Today` tab
 **DONE when** completing a deed writes a `user_logs` row and updates XP+level.
@@ -174,6 +205,25 @@
 - [ ] Extend `scripts/seed.ts` with a `references` array; idempotent via `slug + source`
 - [ ] Coverage: every category gets at least 2 deeds with references; chosen deeds include classic evidences (e.g., charity ↔ Surah Al-Baqarah 2:261, smile ↔ hadith of the Prophet's smile, etc.)
 - [ ] `lesson_ar` filled for ~half the refs; `text_en` filled for ~a quarter (pilot coverage, full translation is i18n backfill work)
+
+### P2-T05d — `Skipped` node state + `SkipToggle` gesture
+**DONE when** users can tap "Not for me" on any Node, DeedCard, or the Challenge Detail header; skipped deeds render as dimmed `Skipped` nodes on the Roadmap and can be un-skipped from Settings.
+
+- [ ] `src/components/SkipToggle.tsx` (Lucide `eye-off` outline/filled); accepts `deedId`, `size`
+- [ ] Wired on `Node` overlay, `DeedCard`, and `app/deed/[id].tsx` header
+- [ ] New `Node` state `Skipped` per SPEC §5.1 (dimmed, slate-blue, eye-with-slash icon, never gates progression)
+- [ ] Underlying Available/Completed/Mastered state still computed correctly so un-skip restores the right state
+- [ ] Settings: new "Skipped deeds" section listing `user_skipped` rows with `Un-skip` action per row + empty-state copy
+- [ ] Optimistic update via local store + repo reconcile on next focus
+- [ ] RNTL tests: skipping renders dimmed node, un-skip restores prior state
+
+### P2-T05e — Circumstance chips on Challenge Detail
+**DONE when** Challenge Detail's `Today` tab shows a small `CircumstanceChip` row when the deed has any tags, with no chips when none.
+
+- [ ] `src/components/CircumstanceChip.tsx`; uses `skip.chipLabel` i18n key prefix
+- [ ] Hook `useCircumstances(deedId)` calling `circumstancesRepo.listForDeed`
+- [ ] Layout: horizontal `ScrollView` of chips below the hero block, before the stepper
+- [ ] RNTL snapshot for: no-tags, one-tag, three-tags; light + dark + AR/EN
 
 ### P2-T06 — Challenge Detail — `History` tab
 **DONE when** the History tab lists every prior log of that deed in reverse-chronological order.
@@ -211,10 +261,43 @@
 - [ ] Expo Router typed routes enabled
 - [ ] Shared-element transition (experimental flag) on detail open
 
-### P2-T11 — Phase 2 demo build
-**DONE when** all four primary screens demo without console errors in Preview APK.
+### P2-T12 — `HeartButton` component + usages
+**DONE when** tapping the heart on `DeedCard`, `Node`, and Challenge Detail header toggles bookmark state without navigating away, with haptic feedback.
 
-- [ ] Manual smoke matrix recorded (see SPEC §11)
+- [ ] `src/components/HeartButton.tsx` (Lucide `heart` outline/filled); accepts `deedId`, `size`, optional `withBadge`
+- [ ] Wired on `DeedCard`, `Node` overlay, and `app/deed/[id].tsx` header
+- [ ] Optimistic update via local store + repo reconcile on next focus
+- [ ] RNTL tests for outline → filled transition and idempotent re-tap
+
+### P2-T13 — Bookmarks screen + Roadmap top-bar icon
+**DONE when** the heart icon in the Roadmap top bar shows the bookmark count as a badge and opens `/bookmarks`, which lists every saved deed.
+
+- [ ] `app/bookmarks/index.tsx` rendering a `FlatList` of `DeedCard`s ordered by `user_bookmarks.created_at` desc
+- [ ] Empty-state component + "Browse the catalog" CTA linking to `/catalog`
+- [ ] Roadmap top-bar icon wired to `/bookmarks` with numeric badge when `count > 0`
+- [ ] RNTL snapshot in light + dark + AR/EN, both populated and empty cases
+
+### P2-T14 — Category progress indicator
+**DONE when** every `CategoryCard` shows a `x/y` badge, a progress bar that fills to `accent-gold` when complete, and a trophy overlay at 100%.
+
+- [ ] Add `progressRepo.categoryProgress()` returning `{ categoryId, done, total }[]` (single GROUP BY query)
+- [ ] Hook `useCategoryProgress()` invalidating on every `useLogDeed()` success and on app focus
+- [ ] `src/components/ProgressBadge.tsx` (locale-aware numeral formatting)
+- [ ] Extend `CategoryCard` with badge + progress bar + trophy state
+- [ ] Add `(x/y)` indicator to `CategoryChip` (small, muted)
+- [ ] RNTL tests: `x=0`, `x<y`, `x=y` (trophy), all in light + dark
+
+### P2-T15 — Unit progress on Roadmap headers
+**DONE when** each unit header on the Roadmap screen shows an aggregate `x/y` across all deeds in that unit.
+
+- [ ] `progressRepo.unitProgress()` returning `{ unitId, done, total }[]`
+- [ ] `src/components/UnitProgress.tsx`; used in the Roadmap's unit header
+- [ ] Hook `useUnitProgress()` with same invalidation rules as `useCategoryProgress`
+
+### P2-T16 — Phase 2 demo build
+**DONE when** all primary screens (Roadmap, Detail, Catalog, Bookmarks, History, Settings) demo without console errors in Preview APK.
+
+- [ ] Manual smoke matrix recorded (see SPEC §11); new screen added: Bookmarks
 - [ ] `eas build --profile preview`
 
 ---
