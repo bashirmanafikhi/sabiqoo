@@ -57,6 +57,15 @@ function seedCategories_(sqlite: SQLite.SQLiteDatabase): void {
         c.sort_order,
       ],
     );
+    // Always reconcile icon_name + color_code with the canonical seed
+    // values. Idempotent: UPDATE keeps the row's id (and any FKs intact)
+    // while applying the latest icon glyph. This way a previously seeded
+    // database is refreshed without requiring a wipe-and-reinstall.
+    exec(
+      sqlite,
+      'UPDATE categories SET icon_name = ?, color_code = ? WHERE name_en = ?',
+      [c.icon_name, c.color_code, c.name_en],
+    );
   }
 }
 
