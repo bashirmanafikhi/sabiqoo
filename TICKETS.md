@@ -13,9 +13,22 @@
 
 - [ ] Run `npx create-expo-app sabiqoo --template default` (or init in current repo with Expo CLI)
 - [ ] Add app.json `name: "Sabiqoo"`, `slug: "sabiqoo"`, `scheme: "sabiqoo"`
+- [ ] Set `android.package: "com.bashirmanafikhi.sabiqoo"` and `ios.bundleIdentifier: "com.bashirmanafikhi.sabiqoo"` in `app.json` (**locked-in immediately** — Android package id is immutable after first store publish)
 - [ ] Set `experiments.typedRoutes: true`
 - [ ] Enable TS strict (`tsconfig.json` `"strict": true`, `"noUncheckedIndexedAccess": true`)
 - [ ] Pin Expo SDK + verify `package.json` peer ranges match
+- [ ] See **P1-T01a** for app-icon sourcing from the supplied JPG
+
+### P1-T01a — App icon (`assets/icon-source.jpg` → Expo icon set)
+**DONE when** the supplied JPG becomes the app icon on iOS and Android and is referenced from `app.json`.
+
+- [ ] Copy source: `C:\Users\bashir\Downloads\sabiqoo-icon.jpg` → `assets/icon-source.jpg` (read-only reference)
+- [ ] Generate `assets/icon.png` (1024×1024, transparent background where appropriate) by re-exporting the JPG with `sharp` or `expo-asset` utilities
+- [ ] Set `app.json` `expo.icon: "./assets/icon.png"`
+- [ ] Generate `assets/adaptive-icon.png` (Android adaptive, 1024×1024 with safe-area awareness) and reference `expo.android.adaptiveIcon.foregroundImage`
+- [ ] Generate `assets/splash.png` for `expo.splash.image` if a splash version of the icon is needed (Phase 1 stub is fine; final splash artwork comes in Phase 3)
+- [ ] Run `npx expo prebuild --no-install` to confirm Expo accepts the icon set
+- [ ] Verify the icon renders correctly in `eas build --profile preview` for both platforms
 
 ### P1-T02 — Install core deps
 **DONE when** `package.json` lists every dependency from SPEC §2 at compatible versions.
@@ -346,7 +359,7 @@
 **DONE when** `eas build --profile production` produces signed AAB + IPA for store submission.
 
 - [ ] `eas.json` profiles: `preview`, `production`, `ad-hoc`
-- [ ] Configure iOS bundle id, Android package id, app icon set, adaptive icon, splash
+- [ ] **Pre-set by P1-T01**: iOS bundle id, Android package id, app icon set, adaptive icon, splash are already in `app.json` — verify they're honoured by EAS
 - [ ] Privacy manifest (iOS), data safety form (Android) generated from SPEC §1 non-goals
 - [ ] Submit checklist doc in `docs/launch.md`
 
