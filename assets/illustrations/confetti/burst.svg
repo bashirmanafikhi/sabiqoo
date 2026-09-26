@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" role="img" aria-label="Confetti burst (static fallback)">
+  <g transform="translate(200 200)">
+    <rect x="-4" y="-140" width="8" height="20" rx="3" fill="#58CC02" stroke="#1F1F1F" stroke-width="1" transform="rotate(15)"/>
+    <rect x="-4" y="-140" width="8" height="20" rx="3" fill="#1CB0F6" stroke="#1F1F1F" stroke-width="1" transform="rotate(60)"/>
+    <rect x="-4" y="-140" width="8" height="20" rx="3" fill="#FFC800" stroke="#1F1F1F" stroke-width="1" transform="rotate(110)"/>
+    <rect x="-4" y="-140" width="8" height="20" rx="3" fill="#FF4D4D" stroke="#1F1F1F" stroke-width="1" transform="rotate(160)"/>
+    <rect x="-4" y="-140" width="8" height="20" rx="3" fill="#58CC02" stroke="#1F1F1F" stroke-width="1" transform="rotate(210)"/>
+    <rect x="-4" y="-140" width="8" height="20" rx="3" fill="#1CB0F6" stroke="#1F1F1F" stroke-width="1" transform="rotate(260)"/>
+    <rect x="-4" y="-140" width="8" height="20" rx="3" fill="#FFC800" stroke="#1F1F1F" stroke-width="1" transform="rotate(310)"/>
+
+    <circle cx="0" cy="-110" r="6" fill="#FFC800" stroke="#1F1F1F" stroke-width="1.5"/>
+    <circle cx="100" cy="-50" r="6" fill="#FF4D4D" stroke="#1F1F1F" stroke-width="1.5"/>
+    <circle cx="100" cy="50" r="6" fill="#58CC02" stroke="#1F1F1F" stroke-width="1.5"/>
+    <circle cx="0" cy="110" r="6" fill="#1CB0F6" stroke="#1F1F1F" stroke-width="1.5"/>
+    <circle cx="-100" cy="50" r="6" fill="#FFC800" stroke="#1F1F1F" stroke-width="1.5"/>
+    <circle cx="-100" cy="-50" r="6" fill="#FF4D4D" stroke="#1F1F1F" stroke-width="1.5"/>
+
+    <path d="M40 -90 L41.7 -86.3 L46 -85.6 L42.7 -82.6 L43.7 -78.7 L40 -80.6 L36.3 -78.7 L37.3 -82.6 L34 -85.6 L38.3 -86.3 Z"
+          fill="#1CB0F6" stroke="#1F1F1F" stroke-width="1" stroke-linejoin="round"/>
+    <path d="M-40 90 L-38.3 93.7 L-34 94.4 L-37.3 97.4 L-36.3 101.3 L-40 99.4 L-43.7 101.3 L-42.7 97.4 L-46 94.4 L-41.7 93.7 Z"
+          fill="#58CC02" stroke="#1F1F1F" stroke-width="1" stroke-linejoin="round"/>
+    <path d="M-90 -10 L-88 -6 L-84 -5.5 L-87 -2 L-86 2 L-90 0 L-94 2 L-93 -2 L-96 -5.5 L-92 -6 Z"
+          fill="#FFC800" stroke="#1F1F1F" stroke-width="1" stroke-linejoin="round"/>
+
+    <circle cx="140" cy="0" r="4" fill="#58CC02"/>
+    <circle cx="-140" cy="0" r="4" fill="#FF4D4D"/>
+    <circle cx="50" cy="140" r="4" fill="#1CB0F6"/>
+    <circle cx="-50" cy="-140" r="4" fill="#FFC800"/>
+  </g>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80" role="img" aria-label="Mastered roadmap node">
+  <ellipse cx="40" cy="74" rx="22" ry="3" fill="#1F1F1F" opacity="0.18"/>
+  <circle cx="40" cy="44" r="28" fill="#E5A800"/>
+  <circle cx="40" cy="40" r="28" fill="#FFC800" stroke="#1F1F1F" stroke-width="2"/>
+  <path d="M30 22 L32.5 31.5 L42.5 31.5 L35 37.5 L38 47 L30 41 L22 47 L25 37.5 L17.5 31.5 L27.5 31.5 Z"
+        fill="#FFFFFF" stroke="#1F1F1F" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M52 22 Q60 30 58 40 Q56 48 48 50 Q40 52 42 42 Q46 36 50 30 Q51 26 52 22 Z"
+        fill="#FF4D4D" stroke="#1F1F1F" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M53 26 Q57 32 55 40 Q53 44 48 44 Q50 38 52 34 Q52 30 53 26 Z" fill="#FFA500"/>
+</svg>

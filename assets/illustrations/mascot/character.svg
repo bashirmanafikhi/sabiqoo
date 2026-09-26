@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 260" width="200" height="260" role="img" aria-label="Sabiqoo mascot character holding a heart">
+  <ellipse cx="100" cy="248" rx="50" ry="6" fill="#1F1F1F" opacity="0.15"/>
+  <ellipse cx="78" cy="240" rx="14" ry="6" fill="#1F1F1F" opacity="0.6"/>
+  <ellipse cx="122" cy="240" rx="14" ry="6" fill="#1F1F1F" opacity="0.6"/>
+
+  <!-- body -->
+  <path d="M40 130 Q40 60 100 60 Q160 60 160 130 Q160 200 100 220 Q40 200 40 130 Z"
+        fill="#58CC02" stroke="#1F1F1F" stroke-width="3"/>
+
+  <!-- white belly -->
+  <path d="M62 142 Q62 200 100 210 Q138 200 138 142 Q120 170 100 170 Q80 170 62 142 Z"
+        fill="#FFFFFF" stroke="#1F1F1F" stroke-width="2"/>
+
+  <!-- eyes -->
+  <circle cx="80" cy="115" r="14" fill="#FFFFFF" stroke="#1F1F1F" stroke-width="2.5"/>
+  <circle cx="120" cy="115" r="14" fill="#FFFFFF" stroke="#1F1F1F" stroke-width="2.5"/>
+  <circle cx="83" cy="118" r="6" fill="#1F1F1F"/>
+  <circle cx="123" cy="118" r="6" fill="#1F1F1F"/>
+  <circle cx="86" cy="115" r="2" fill="#FFFFFF"/>
+  <circle cx="126" cy="115" r="2" fill="#FFFFFF"/>
+
+  <!-- cheeks -->
+  <circle cx="68" cy="138" r="5" fill="#FF7A7A" opacity="0.7"/>
+  <circle cx="132" cy="138" r="5" fill="#FF7A7A" opacity="0.7"/>
+
+  <!-- smile -->
+  <path d="M88 144 Q100 156 112 144" fill="none" stroke="#1F1F1F" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- arms (raised, holding a heart) -->
+  <path d="M50 160 Q30 130 52 96" fill="none" stroke="#1F1F1F" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M150 160 Q170 130 148 96" fill="none" stroke="#1F1F1F" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="52" cy="92" r="7" fill="#58CC02" stroke="#1F1F1F" stroke-width="2"/>
+  <circle cx="148" cy="92" r="7" fill="#58CC02" stroke="#1F1F1F" stroke-width="2"/>
+
+  <!-- heart held above -->
+  <path d="M70 56 Q70 38 88 38 Q100 38 100 50 Q100 38 112 38 Q130 38 130 56 Q130 76 100 92 Q70 76 70 56 Z"
+        fill="#FF4D4D" stroke="#1F1F1F" stroke-width="2.5" stroke-linejoin="round"/>
+  <ellipse cx="84" cy="48" rx="3" ry="2" fill="#FFFFFF" opacity="0.6"/>
+</svg>
