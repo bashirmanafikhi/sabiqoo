@@ -1,0 +1,94 @@
+{
+  "app": {
+    "name": "Sabiqoo"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "close": "Close",
+    "loading": "Loading…",
+    "retry": "Retry",
+    "search": "Search"
+  },
+  "home": {
+    "title": "Roadmap",
+    "streak": "{{days}}-day streak",
+    "streak_unit": "days",
+    "xpLevel": "Lvl {{level}}",
+    "bookmarks": "My List",
+    "language": "Language",
+    "settings": "Settings"
+  },
+  "catalog": {
+    "title": "Catalog",
+    "searchPlaceholder": "Search deeds…",
+    "searchHint": "Searches deed titles and descriptions.",
+    "empty": "No deeds match your search.",
+    "progress": "{{done}} of {{total}}",
+    "locked": "Locked"
+  },
+  "deed": {
+    "tabs": {
+      "today": "Today",
+      "evidence": "Evidence",
+      "history": "History"
+    },
+    "markCompleted": "Mark as Completed (+{{xp}} XP)",
+    "quantity": "Quantity",
+    "notePlaceholder": "Add a note (optional)",
+    "noteHint": "Optional note shown in your history.",
+    "category": "Category",
+    "reference": {
+      "quran": "Qur'an",
+      "hadith": "Hadith",
+      "athkar": "Athkar",
+      "lesson": "Lesson:",
+      "empty": "No religious evidence has been added for this deed yet."
+    },
+    "history": {
+      "empty": "No completed deeds yet.",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "daysAgo": "{{n}} days ago"
+    }
+  },
+  "bookmarks": {
+    "title": "My List",
+    "empty": "You haven't saved any deeds yet. Browse the catalog and add what inspires you.",
+    "emptyCta": "Browse the catalog",
+    "added": "Added to your list",
+    "removed": "Removed from your list",
+    "count": "{{count}} saved"
+  },
+  "history": {
+    "title": "History",
+    "last30Days": "Last 30 days",
+    "byCategory": "By category"
+  },
+  "settings": {
+    "title": "Settings",
+    "theme": "Theme",
+    "theme.system": "System",
+    "theme.light": "Light",
+    "theme.dark": "Dark",
+    "language": "Language",
+    "streakFreeze": "Streak freeze",
+    "streakFreezeDesc": "Use a freeze to keep your streak alive when you miss a day.",
+    "about": "About",
+    "version": "Version {{v}}"
+  },
+  "reward": {
+    "streak": "🔥 {{n}}",
+    "xp": "+{{xp}} XP",
+    "levelUp": "Level up!",
+    "celebrate": "Well done!"
+  },
+  "skip": {
+    "toggle": "Not for me",
+    "undoToggle": "Un-skip",
+    "sectionTitle": "Skipped deeds",
+    "sectionEmpty": "You haven't skipped any deeds yet.",
+    "lockedHint": "This deed isn't right for you. You can come back to it anytime."
+  }
+}

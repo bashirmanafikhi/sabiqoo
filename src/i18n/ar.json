@@ -1,0 +1,94 @@
+{
+  "app": {
+    "name": "سابقوا"
+  },
+  "common": {
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "close": "إغلاق",
+    "loading": "جاري التحميل...",
+    "retry": "إعادة المحاولة",
+    "search": "بحث"
+  },
+  "home": {
+    "title": "خارطة الطريق",
+    "streak": "سلسلة {{days}} يومًا",
+    "streak_unit": "يوم",
+    "xpLevel": "المستوى {{level}}",
+    "bookmarks": "قائمتي",
+    "language": "اللغة",
+    "settings": "الإعدادات"
+  },
+  "catalog": {
+    "title": "الكتالوج",
+    "searchPlaceholder": "ابحث عن عمل خيري...",
+    "searchHint": "يبحث في عناوين الأعمال ووصفها.",
+    "empty": "لا توجد أعمال تطابق بحثك.",
+    "progress": "{{done}} من {{total}}",
+    "locked": "مغلق"
+  },
+  "deed": {
+    "tabs": {
+      "today": "اليوم",
+      "evidence": "الدليل",
+      "history": "السجل"
+    },
+    "markCompleted": "تم إنجاز التحدي (+{{xp}} XP)",
+    "quantity": "الكمية",
+    "notePlaceholder": "أضف ملاحظة (اختياري)",
+    "noteHint": "ملاحظة اختيارية تظهر في سجلك.",
+    "category": "الصنف",
+    "reference": {
+      "quran": "قرآن كريم",
+      "hadith": "حديث شريف",
+      "athkar": "أذكار",
+      "lesson": "الدرس:",
+      "empty": "لم يُضف دليل شرعي لهذا العمل بعد."
+    },
+    "history": {
+      "empty": "لم تُكمل أي عمل بعد.",
+      "today": "اليوم",
+      "yesterday": "أمس",
+      "daysAgo": "منذ {{n}} يوم"
+    }
+  },
+  "bookmarks": {
+    "title": "قائمتي",
+    "empty": "لم تحفظ أي عمل بعد. تصفّح الكتالوج وأضف ما يلهمك.",
+    "emptyCta": "تصفّح الكتالوج",
+    "added": "أضيف إلى قائمتي",
+    "removed": "أزيل من قائمتي",
+    "count": "{{count}} محفوظ"
+  },
+  "history": {
+    "title": "السجل",
+    "last30Days": "آخر 30 يومًا",
+    "byCategory": "حسب الصنف"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "theme": "المظهر",
+    "theme.system": "النظام",
+    "theme.light": "فاتح",
+    "theme.dark": "داكن",
+    "language": "اللغة",
+    "streakFreeze": "تجميد السلسلة",
+    "streakFreezeDesc": "استخدم التجميد للحفاظ على سلسلتك عند تفويت يوم.",
+    "about": "حول التطبيق",
+    "version": "الإصدار {{v}}"
+  },
+  "reward": {
+    "streak": "🔥 {{n}}",
+    "xp": "+{{xp}} XP",
+    "levelUp": "ارتقاء المستوى!",
+    "celebrate": "أحسنت!"
+  },
+  "skip": {
+    "toggle": "غير مناسب لي",
+    "undoToggle": "إلغاء التخطي",
+    "sectionTitle": "الأعمال التي تخطيتها",
+    "sectionEmpty": "لم تتخطَّ أي عمل بعد.",
+    "lockedHint": "هذا العمل لا يناسبك، يمكنك العودة إليه متى ما استطعت."
+  }
+}
