@@ -2,6 +2,7 @@ import * as SQLite from 'expo-sqlite';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import * as schema from './schema';
 import { bootstrapRuntimeDb } from './migrate';
+import { seedIfEmpty } from './seed-runtime';
 
 type SchemaDb = ReturnType<typeof drizzle<typeof schema>>;
 
@@ -15,9 +16,11 @@ export function getDb(): SchemaDb {
 }
 
 /**
- * One-shot app-boot setup. Idempotent: every CREATE uses IF NOT EXISTS.
+ * One-shot app-boot setup. Idempotent: every CREATE uses IF NOT EXISTS and the
+ * seed only runs when the deeds table is empty.
  */
 export async function initDb(): Promise<void> {
   const db = getDb();
   bootstrapRuntimeDb(db);
+  seedIfEmpty(db);
 }

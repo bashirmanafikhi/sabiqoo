@@ -1,14 +1,14 @@
 // __tests__/seed.test.ts
 //
 // Unit tests for the seed authoring arrays. These tests do not open a
-// database; they only validate the in-memory arrays in `scripts/authoring.ts`.
+// database; they only validate the in-memory arrays in `src/db/seed-data.ts`.
 
 import {
   seedUnits,
   seedCategories,
   seedDeeds,
   seedReferences,
-} from '../scripts/authoring';
+} from '../src/db/seed-data';
 
 const ALL_CATEGORY_IDS = seedCategories.map((c) => c.id);
 const ALL_UNIT_IDS = seedUnits.map((u) => u.id);

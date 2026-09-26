@@ -23,7 +23,7 @@ import {
   seedCategories,
   seedDeeds,
   seedReferences,
-} from './authoring';
+} from '../src/db/seed-data';
 
 const DEFAULT_DB_PATH = path.resolve(process.cwd(), 'sabiqoo.db');
 const DB_PATH = process.argv[2]
