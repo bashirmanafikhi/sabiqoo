@@ -24,8 +24,7 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      },
-      "edgeToEdgeEnabled": true
+      }
     },
     "web": {
       "favicon": "./assets/icon.png",
@@ -34,7 +33,6 @@
     "plugins": [
       "expo-router",
       "expo-localization",
-      "expo-sqlite",
       "expo-splash-screen"
     ],
     "experiments": {
