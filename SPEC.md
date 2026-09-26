@@ -154,6 +154,22 @@ CREATE TABLE user_profile (
   last_active_date     TEXT,                              -- 'YYYY-MM-DD' local
   streak_freezes_left  INTEGER NOT NULL DEFAULT 2
 );
+
+-- Religious evidence (ayah / hadith / athkar) — optional, 1:N per deed
+CREATE TABLE deed_references (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  deed_id     INTEGER NOT NULL,
+  type        TEXT NOT NULL CHECK (type IN ('quran','hadith','athkar')),
+  text_ar     TEXT NOT NULL,                       -- original Arabic scripture
+  text_en     TEXT,                                -- optional translation
+  source      TEXT NOT NULL,                       -- "Surah Al-Baqarah 2:183" / "Sahih Bukhari 1234"
+  narrator    TEXT,                                -- hadith only; null otherwise
+  lesson_ar   TEXT,                                -- optional brief lesson
+  lesson_en   TEXT,
+  sort_order  INTEGER NOT NULL DEFAULT 0,
+  FOREIGN KEY (deed_id) REFERENCES deeds(id) ON DELETE CASCADE
+);
+CREATE INDEX idx_deed_references_deed_id ON deed_references(deed_id);
 ```
 
 ### 4.2 Seed
@@ -192,13 +208,14 @@ app/
 
 ### 5.2 Challenge Detail (`/deed/[id]`)
 
-- **Tabs**: `Today` (default) · `History`.
+- **Tabs**: `Today` (default) · `Evidence` (الدليل) · `History`.
 - **Today**:
   - Hero icon, title (localized), category badge, XP value.
   - Quantity stepper (`-`, value, `+`; min 1, max 50).
   - Optional `note` textarea.
   - Big 3D `Mark Completed` button (full-width, brand green).
   - On tap: write `user_logs`, update `user_profile`, fire `ConfettiOverlay`, haptic `success`, optional click sound. (See §7.4 for trigger rules.)
+- **Evidence**: read-only list of `deed_references` rows for this deed, grouped by `type` (quran / hadith / athkar). Each item shows the source citation, original Arabic `text_ar` (RTL block), optional `text_en` translation toggle, and optional `lesson`. Empty-state copy when no references exist.
 - **History**: scrollable timeline grouped by `day_bucket`. Each row: time, quantity, XP, note preview.
 
 ### 5.3 Catalog
@@ -232,6 +249,7 @@ app/
 | `CategoryCard` | Catalog tile | `category`, `isActive`, `onPress` |
 | `DeedCard` | Catalog entry | `deed`, `locked`, `onPress` |
 | `LogRow` | One entry in history | `log`, `deed`, `locale` |
+| `ReferenceCard` | One ayah / hadith / athkar reference in the Evidence tab | `reference`, `locale` |
 | `StreakBadge` | 🔥 + N | `streak`, `freezesLeft` |
 | `XpBar` | Progress to next level | `xp`, `level` |
 | `ConfettiOverlay` | Reanimated + Lottie celebration | `visible`, `xpEarned`, `onDone` |
@@ -291,7 +309,13 @@ xpForLevel(1) = 100, xpForLevel(2) = 300, xpForLevel(3) = 600, …
   ```json
   {
     "home.streak": { "ar": "سلسلة {{days}} أيام", "en": "{{days}}-day streak" },
-    "deed.markCompleted": { "ar": "تم إنجاز التحدي (+{{xp}} XP)", "en": "Mark as Completed (+{{xp}} XP)" }
+    "deed.markCompleted": { "ar": "تم إنجاز التحدي (+{{xp}} XP)", "en": "Mark as Completed (+{{xp}} XP)" },
+    "deed.tabs.evidence":  { "ar": "الدليل",  "en": "Evidence" },
+    "deed.reference.quran":  { "ar": "قرآن كريم",    "en": "Qur'an" },
+    "deed.reference.hadith": { "ar": "حديث شريف",   "en": "Hadith" },
+    "deed.reference.athkar": { "ar": "أذكار",        "en": "Athkar" },
+    "deed.reference.lesson": { "ar": "الدرس:",       "en": "Lesson:" },
+    "deed.reference.empty":  { "ar": "لا يوجد دليل شرعي لهذا العمل بعد.", "en": "No religious evidence has been added for this deed yet." }
   }
   ```
 

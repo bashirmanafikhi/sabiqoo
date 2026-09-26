@@ -152,6 +152,29 @@
 - [ ] `<BigButton3D label={t('deed.markCompleted', {xp})}/>`
 - [ ] On submit: write log, update profile, navigate back, fire `<ConfettiOverlay>`
 
+### P2-T05a — `deed_references` table + repo
+**DONE when** migration `0002_add_deed_references.sql` applies cleanly and `referencesRepo.listByDeed(id)` returns typed rows.
+
+- [ ] Add `deed_references` table to `src/db/schema.ts` (per SPEC §4.1)
+- [ ] `drizzle-kit generate` produces `0002_add_deed_references.sql`; review and commit
+- [ ] `src/repos/referencesRepo.ts` exporting `listByDeed(deedId)` and `upsertByDeed(deedId, rows)`
+- [ ] Unit tests against in-memory SQLite (insert, list, cascade delete)
+
+### P2-T05b — `Evidence` tab in Challenge Detail
+**DONE when** Challenge Detail renders a third tab listing this deed's references grouped by type, or empty-state copy if none.
+
+- [ ] Update `app/deed/[id].tsx` to expose three tabs (Today · Evidence · History); tab key `evidence`
+- [ ] New `src/components/ReferenceCard.tsx` (RTL-aware text block, source caption, optional `lesson_*` row, optional `text_en` toggle)
+- [ ] Group order: quran → hadith → athkar; per-group `FlatList`
+- [ ] RNTL snapshot in light + dark + AR/EN, both populated and empty cases
+
+### P2-T05c — Seed references for ~15 deeds
+**DONE when** seeded DB contains ≥ 25 references across quran / hadith / athkar types for ≥ 15 deeds, and at least 5 deeds have **zero** references to exercise the empty state.
+
+- [ ] Extend `scripts/seed.ts` with a `references` array; idempotent via `slug + source`
+- [ ] Coverage: every category gets at least 2 deeds with references; chosen deeds include classic evidences (e.g., charity ↔ Surah Al-Baqarah 2:261, smile ↔ hadith of the Prophet's smile, etc.)
+- [ ] `lesson_ar` filled for ~half the refs; `text_en` filled for ~a quarter (pilot coverage, full translation is i18n backfill work)
+
 ### P2-T06 — Challenge Detail — `History` tab
 **DONE when** the History tab lists every prior log of that deed in reverse-chronological order.
 
