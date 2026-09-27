@@ -19,6 +19,9 @@
     "postinstall": "node scripts/patch-expo-sqlite.cjs"
   },
   "dependencies": {
+    "@expo-google-fonts/cairo": "0.4.2",
+    "@expo-google-fonts/epilogue": "0.4.2",
+    "@expo-google-fonts/plus-jakarta-sans": "0.4.2",
     "@expo/vector-icons": "^14.0.4",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@tanstack/react-query": "^5.59.0",
