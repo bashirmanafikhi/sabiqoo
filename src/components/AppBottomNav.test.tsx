@@ -8,7 +8,14 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
   default: { getItem: jest.fn().mockResolvedValue(null), setItem: jest.fn().mockResolvedValue(undefined), removeItem: jest.fn().mockResolvedValue(undefined) },
 }));
 jest.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (k: string) => k, i18n: { language: 'en' } }),
+  useTranslation: () => {
+    const dict: Record<string, string> = {
+      'home.title': 'Roadmap',
+      'catalog.title': 'Catalog',
+      'history.title': 'History',
+    };
+    return { t: (k: string) => dict[k] ?? k, i18n: { language: 'en' } };
+  },
 }));
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
