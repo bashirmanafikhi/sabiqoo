@@ -331,7 +331,17 @@ assets/icon-*.png                             (regenerated)
 package.json
 __tests__/components/*.test.tsx
 __tests__/screens/*.test.tsx
-docs/STYLE.md                                 (rewrite §1–§9 to match)
+
+## 11a. Cleanup at start of implementation
+
+The following legacy artifacts are deleted as the first step of implementation
+(replacing them with the new system):
+
+- `STYLE.md` — root-level, documents the old green/blue/gold palette. Deleted.
+- `assets/illustrations/` — entire folder (`nodes/`, `trophies/`, `confetti/`,
+  `README.md`). Replaced by the new component primitives
+  (`RoadmapNode`, `CatalogDeedCard`, `Button3D`, etc.) and the new Lottie
+  confetti is generated fresh keyed to the coral/navy/tangerine/gold palette.
 ```
 
 ---

@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80" role="img" aria-label="Available roadmap node">
-  <circle cx="40" cy="40" r="36" fill="none" stroke="#58CC02" stroke-width="1.5" opacity="0.25"/>
-  <circle cx="40" cy="40" r="33" fill="none" stroke="#58CC02" stroke-width="1.5" opacity="0.5"/>
-  <ellipse cx="40" cy="74" rx="22" ry="3" fill="#1F1F1F" opacity="0.18"/>
-  <circle cx="40" cy="44" r="28" fill="#58A700"/>
-  <circle cx="40" cy="40" r="28" fill="#58CC02" stroke="#1F1F1F" stroke-width="2"/>
-  <path d="M40 26 L42.6 34.7 L52 34.7 L45 40.3 L47.6 49 L40 44 L32.4 49 L35 40.3 L28 34.7 L37.4 34.7 Z"
-        fill="#FFC800" stroke="#1F1F1F" stroke-width="1.5" stroke-linejoin="round"/>
-</svg>
