@@ -1,84 +1,67 @@
 import { createContext, useContext } from 'react';
 
 export type ColorPalette = {
+  coral: string;
+  coralDark: string;
+  navy: string;
+  navyDark: string;
+  tangerine: string;
+  tangerineDark: string;
+  gold: string;
+  goldDark: string;
   bg: string;
+  surfaceLowest: string;
+  surfaceLow: string;
   surface: string;
-  elevated: string;
+  surfaceHigh: string;
+  surfaceHighest: string;
   border: string;
+  outline: string;
   text: string;
   textPrimary: string;
   textMuted: string;
-  brand: string;
-  brandDark: string;
-  brandBlue: string;
-  brandBlueDark: string;
-  gold: string;
-  goldDark: string;
-  fire: string;
-  fireSoft: string;
-  slateBlue: string;
-  slateBlueDark: string;
-  stateLocked: string;
-  stateLockedDark: string;
-  ink: string;
-  paper: string;
   success: string;
   warning: string;
-  danger: string;
 };
 
 export const lightColors = {
-  bg: '#FFFFFF',
-  surface: '#F7F7F7',
-  elevated: '#FFFFFF',
-  border: '#E5E5E5',
-  text: '#1F1F1F',
-  textPrimary: '#1F1F1F',
-  textMuted: '#777777',
-  brand: '#58CC02',
-  brandDark: '#58A700',
-  brandBlue: '#1CB0F6',
-  brandBlueDark: '#0E8FCE',
-  gold: '#FFC800',
-  goldDark: '#E5A800',
-  fire: '#FF4D4D',
-  fireSoft: '#FF7A7A',
-  slateBlue: '#94A3B8',
-  slateBlueDark: '#64748B',
-  stateLocked: '#E5E5E5',
-  stateLockedDark: '#BFBFBF',
-  ink: '#1F1F1F',
-  paper: '#FFFFFF',
-  success: '#58CC02',
-  warning: '#FFC800',
-  danger: '#FF4D4D',
+  coral: '#EA5455', coralDark: '#C83E40',
+  navy: '#2D4059',  navyDark: '#1D2B3D',
+  tangerine: '#F07B3F', tangerineDark: '#CF6027',
+  gold: '#FFD460', goldDark: '#D4A838',
+  bg: '#F8F9FF',
+  surfaceLowest: '#FFFFFF',
+  surfaceLow:    '#EFF4FF',
+  surface:       '#E6EEFF',
+  surfaceHigh:   '#DCE9FF',
+  surfaceHighest:'#D3E4FE',
+  border:        '#E1BFBC',
+  outline:       '#8D706E',
+  text:          '#2D4059',
+  textPrimary:   '#2D4059',
+  textMuted:     '#5B6E85',
+  success:       '#EA5455',
+  warning:       '#F07B3F',
 } as const satisfies ColorPalette;
 
 export const darkColors = {
-  bg: '#0B1220',
-  surface: '#121A2B',
-  elevated: '#1A2438',
-  border: '#22304D',
-  text: '#F4F4F5',
-  textPrimary: '#F4F4F5',
-  textMuted: '#A1A1AA',
-  brand: '#58CC02',
-  brandDark: '#4A8E00',
-  brandBlue: '#1CB0F6',
-  brandBlueDark: '#0E8FCE',
-  gold: '#FFC800',
-  goldDark: '#E5A800',
-  fire: '#FF7A7A',
-  fireSoft: '#FF9999',
-  slateBlue: '#94A3B8',
-  slateBlueDark: '#64748B',
-  stateLocked: '#2A3344',
-  stateLockedDark: '#3A4459',
-  ink: '#1F1F1F',
-  paper: '#0B1220',
-  success: '#58CC02',
-  warning: '#FFC800',
-  danger: '#FF7A7A',
+  coral: '#FF8A8B', coralDark: '#A53031',
+  navy: '#EAF1FF',  navyDark: '#0E1A2C',
+  tangerine: '#FF9C66', tangerineDark: '#B8521D',
+  gold: '#FFD460', goldDark: '#B8912A',
+  bg: '#0E1A2C',
+  surfaceLowest: '#16243A',
+  surfaceLow:    '#1B2C44',
+  surface:       '#1E2F49',
+  surfaceHigh:   '#243651',
+  surfaceHighest:'#2A3E5E',
+  border:        '#3A4A66',
+  outline:       '#5B6E85',
+  text:          '#EAF1FF',
+  textPrimary:   '#EAF1FF',
+  textMuted:     '#A6B6CC',
+  success:       '#FF8A8B',
+  warning:       '#FF9C66',
 } as const satisfies ColorPalette;
 
 export type ThemeMode = 'light' | 'dark' | 'system';
