@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body { font-family: 'PlusJakartaSans_500Medium'; }
+  .dark body { color: #EAF1FF; background-color: #0E1A2C; }
+}
+
+.btn-3d-coral      { box-shadow: 0 4px 0 #C83E40; }
+.btn-3d-coral-dark { box-shadow: 0 4px 0 #A53031; }
+.btn-3d-tangerine  { box-shadow: 0 4px 0 #CF6027; }
+.btn-3d-navy       { box-shadow: 0 4px 0 #1D2B3D; }
+.btn-3d-gold       { box-shadow: 0 4px 0 #D4A838; }
+.btn-3d-pressed    { transform: translateY(3px); }
