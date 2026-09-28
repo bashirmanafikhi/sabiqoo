@@ -21,13 +21,35 @@
     "settings": "الإعدادات",
     "deedCompleted": "تم تسجيل العمل. ما شاء الله!"
   },
+  "roadmap": {
+    "unitProgress": "التقدم: {{done}} من {{total}} خطوة",
+    "chestTitle": "هديّة البركة اليوميّة!",
+    "chestBody": "حافظت على سلسلتك. إليك هديّتك التحفيزيّة اليوميّة:",
+    "todaysRecommended": "عمل اليوم المُقترح",
+    "rewardLabel": "+{{xp}} نقطة • جوهرة بركة واحدة",
+    "completeLabel": "وضع علامة تم",
+    "levelCardTitle": "سبيل البركة",
+    "dailyGoalRemaining": "الهدف اليومي: {{count}} أعمال متبقّية",
+    "branchA": "الخيار أ: روحي",
+    "branchB": "الخيار ب: مالي",
+    "restoreChest": "الحمد لله!"
+  },
   "catalog": {
     "title": "الكتالوج",
     "searchPlaceholder": "ابحث عن عمل خيري...",
     "searchHint": "يبحث في عناوين الأعمال ووصفها.",
     "empty": "لا توجد أعمال تطابق بحثك.",
     "progress": "{{done}} من {{total}}",
-    "locked": "مغلق"
+    "locked": "مغلق",
+    "counter": "عرض {{shown}} من {{total}} عمل",
+    "filtersLabel": "الفلاتر",
+    "activeRealm": "المجال النشط",
+    "masteryLevel": "مستوى الإتقان {{level}}",
+    "emptyTitle": "لا توجد أعمال لبحثك",
+    "emptyBody": "حاول تعديل الكلمات المفتاحيّة أو استكشاف مجالات أخرى أو مسح الفلاتر النشطة.",
+    "clearFilters": "مسح كل الفلاتر",
+    "allDeedsLabel": "كل الأعمال",
+    "allDeedsCount": "{{count}}"
   },
   "deed": {
     "tabs": {
@@ -54,6 +76,31 @@
       "daysAgo": "منذ {{n}} يوم"
     }
   },
+  "deedDetail": {
+    "tabs": { "today": "اليوم", "evidence": "الدليل", "history": "السجل" },
+    "todayCategory": "ابتسامات وكلمات طيّبة يوميّة",
+    "todaySubtitle": "خذ 30 ثانية لإرسال دعاء أو رسالة تشجيعيّة صادقة.",
+    "badgeEasy": "سهل • أقل من دقيقة",
+    "badgeRepeatable": "قابل للتكرار يوميًا",
+    "badgeSunnah": "سنة نبويّة",
+    "stepperLabel": "مرّات الأداء اليوم",
+    "stepperSub": "ضاعف أجرك",
+    "notesLabel": "تأمّل شخصي (اختياري)",
+    "notesPrivate": "خاصّ بك",
+    "notesPlaceholder": "أضف ملاحظة شخصيّة (اختياري)...",
+    "completeCta": "وضع علامة تم (+{{xp}} نقطة)",
+    "celebrationBanner": "بارك الله فيك! تم تسجيل العمل لليوم.",
+    "propheticWisdom": "حكمة نبويّة",
+    "propheticPreview": "«ما من عبد مسلم يدعو لأخيه بظهر الغيب إلا قال الملك: ولك بمثل»",
+    "evidenceAuthentic": "صحيح • أصيل",
+    "evidenceTranslation": "الترجمة",
+    "evidenceLesson": "الدرس والعِبرة",
+    "evidenceCallout": "مَن في قائمة جهات الاتصال لديك يمرّ بضائقة صامتة؟ رسالة من عشر كلمات قد ترفع جبلًا اليوم.",
+    "historyAllTime": "إجمالي الأدعية المُرسلة",
+    "historyXpTotal": "مجموع نقاط البركة",
+    "historyRecentTitle": "أحدث الإنجازات",
+    "historyRecentSub": "آخر 30 يومًا"
+  },
   "bookmarks": {
     "title": "قائمتي",
     "empty": "لم تحفظ أي عمل بعد. تصفّح الكتالوج وأضف ما يلهمك.",
@@ -65,7 +112,29 @@
   "history": {
     "title": "السجل",
     "last30Days": "آخر 30 يومًا",
-    "byCategory": "حسب الصنف"
+    "byCategory": "حسب الصنف",
+    "pageTag": "يوميات المسير",
+    "pageTitle": "الأثر الروحي",
+    "streakTitle": "سلسلة {{days}} يوم",
+    "activeTag": "نشِط",
+    "recordText": "الرقم القياسي: {{record}} يوم • أفضل إنجاز شخصي",
+    "freezesLabel": "{{count}} تجميدات",
+    "statTotal": "المجموع",
+    "statTotalLabel": "الأعمال المسجّلة",
+    "statXp": "النقاط",
+    "statXpLabel": "بركة {{level}}",
+    "statScore": "الدرجة",
+    "statScoreLabel": "الهدف الأسبوعي",
+    "consistencyHeatmap": "خريطة الالتزام",
+    "consistencySub": "نبض النشاط في آخر 30 يومًا",
+    "deedsPerDay": "{{count}} عمل/يوم",
+    "categoryDistribution": "توزيع الأصناف",
+    "categorySub": "حيث تتشعّب بركتك",
+    "recentDeeds": "أحدث الأعمال",
+    "thisWeek": "هذا الأسبوع",
+    "nextMilestone": "الإنجاز التالي",
+    "fewerDeeds": "أعمال أقل",
+    "fiveDeeds": "5 أعمال"
   },
   "settings": {
     "title": "الإعدادات",

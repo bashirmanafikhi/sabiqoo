@@ -21,13 +21,35 @@
     "settings": "Settings",
     "deedCompleted": "Deed logged. MashaAllah!"
   },
+  "roadmap": {
+    "unitProgress": "Progress: {{done}} of {{total}} Steps",
+    "chestTitle": "Daily Barakah Gift!",
+    "chestBody": "You maintained a streak. Here is your daily motivational gift:",
+    "todaysRecommended": "Today's Recommended Deed",
+    "rewardLabel": "+{{xp}} XP • 1 Barakah Gem",
+    "completeLabel": "Mark as Done",
+    "levelCardTitle": "Path of Barakah",
+    "dailyGoalRemaining": "Daily Goal: {{count}} deeds remaining",
+    "branchA": "Choice A: Spiritual",
+    "branchB": "Choice B: Financial",
+    "restoreChest": "Alhamdulillah!"
+  },
   "catalog": {
     "title": "Catalog",
     "searchPlaceholder": "Search deeds…",
     "searchHint": "Searches deed titles and descriptions.",
     "empty": "No deeds match your search.",
     "progress": "{{done}} of {{total}}",
-    "locked": "Locked"
+    "locked": "Locked",
+    "counter": "Showing {{shown}} of {{total}} deeds",
+    "filtersLabel": "Filters",
+    "activeRealm": "Active Realm",
+    "masteryLevel": "Category Mastery Level {{level}}",
+    "emptyTitle": "No deeds found for your search",
+    "emptyBody": "Try adjusting keywords, exploring other realms, or clearing active filters.",
+    "clearFilters": "Clear All Filters",
+    "allDeedsLabel": "All Deeds",
+    "allDeedsCount": "{{count}}"
   },
   "deed": {
     "tabs": {
@@ -54,6 +76,31 @@
       "daysAgo": "{{n}} days ago"
     }
   },
+  "deedDetail": {
+    "tabs": { "today": "Today", "evidence": "Evidence", "history": "History" },
+    "todayCategory": "Everyday Smiles & Kind Words",
+    "todaySubtitle": "Take 30 seconds to send a heartfelt prayer or encouraging message.",
+    "badgeEasy": "Easy • < 1 min",
+    "badgeRepeatable": "Repeatable Daily",
+    "badgeSunnah": "Sunnah Habit",
+    "stepperLabel": "Times performed today",
+    "stepperSub": "Multiply your reward",
+    "notesLabel": "Personal Reflection (Optional)",
+    "notesPrivate": "Private to you",
+    "notesPlaceholder": "Add a personal note (optional)...",
+    "completeCta": "Mark as Completed (+{{xp}} XP)",
+    "celebrationBanner": "Barakallahu Feek! Deed logged for today.",
+    "propheticWisdom": "Prophetic Wisdom",
+    "propheticPreview": "\"No Muslim servant prays for his brother behind his back, but that the angel says: 'And to you the same.'\"",
+    "evidenceAuthentic": "صحيح • Authentic",
+    "evidenceTranslation": "Translation",
+    "evidenceLesson": "Key Lesson & Reflection",
+    "evidenceCallout": "Who in your contacts list is quietly undergoing a hardship? A 10-word text can lift an entire mountain today.",
+    "historyAllTime": "All-Time Duas Sent",
+    "historyXpTotal": "Total Barakah XP",
+    "historyRecentTitle": "Recent Completions",
+    "historyRecentSub": "Last 30 Days"
+  },
   "bookmarks": {
     "title": "My List",
     "empty": "You haven't saved any deeds yet. Browse the catalog and add what inspires you.",
@@ -65,7 +112,29 @@
   "history": {
     "title": "History",
     "last30Days": "Last 30 days",
-    "byCategory": "By category"
+    "byCategory": "By category",
+    "pageTag": "Journey Log",
+    "pageTitle": "Spiritual Footprint",
+    "streakTitle": "{{days}} Day Streak",
+    "activeTag": "Active",
+    "recordText": "Record: {{record}} days • Personal Best",
+    "freezesLabel": "{{count}} Freezes",
+    "statTotal": "Total",
+    "statTotalLabel": "Deeds Logged",
+    "statXp": "XP",
+    "statXpLabel": "Barakah {{level}}",
+    "statScore": "Score",
+    "statScoreLabel": "Weekly Goal",
+    "consistencyHeatmap": "Consistency Heatmap",
+    "consistencySub": "Last 30 Days Activity Pulse",
+    "deedsPerDay": "{{count}} Deeds/day",
+    "categoryDistribution": "Category Distribution",
+    "categorySub": "Where your barakah radiates",
+    "recentDeeds": "Recent Deeds",
+    "thisWeek": "This Week",
+    "nextMilestone": "Next Milestone",
+    "fewerDeeds": "Fewer deeds",
+    "fiveDeeds": "5 deeds"
   },
   "settings": {
     "title": "Settings",
