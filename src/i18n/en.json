@@ -18,7 +18,8 @@
     "xpLevel": "Lvl {{level}}",
     "bookmarks": "My List",
     "language": "Language",
-    "settings": "Settings"
+    "settings": "Settings",
+    "deedCompleted": "Deed logged. MashaAllah!"
   },
   "catalog": {
     "title": "Catalog",
