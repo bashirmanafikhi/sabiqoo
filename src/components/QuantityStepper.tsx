@@ -124,8 +124,8 @@ function StepperButton({
         height: BUTTON_SIZE,
         borderRadius: 14,
         borderWidth: 2,
-        borderColor: disabled ? colors.border : colors.ink,
-        backgroundColor: disabled ? colors.surface : colors.elevated,
+        borderColor: disabled ? colors.border : colors.navyDark,
+        backgroundColor: disabled ? colors.surface : colors.surfaceLowest,
         alignItems: 'center',
         justifyContent: 'center',
       }}

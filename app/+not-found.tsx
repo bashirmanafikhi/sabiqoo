@@ -43,11 +43,11 @@ export default function NotFoundScreen() {
           paddingVertical: 12,
           borderRadius: 12,
           borderWidth: 2,
-          borderColor: colors.ink,
-          backgroundColor: colors.brand,
+          borderColor: colors.navyDark,
+          backgroundColor: colors.coral,
         }}
       >
-        <Text className="text-base font-bold" style={{ color: colors.paper }}>
+        <Text className="text-base font-bold" style={{ color: colors.surfaceLowest }}>
           {t('common.cancel')}
         </Text>
       </Pressable>

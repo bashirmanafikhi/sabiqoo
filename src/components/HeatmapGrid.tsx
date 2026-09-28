@@ -35,6 +35,7 @@ export function HeatmapGrid({ days, weekStart = 1 }: HeatmapGridProps) {
           <View key={row} className="flex-row" style={{ gap: 6 }}>
             {days.slice(row * 7, row * 7 + 7).map((d, col) => {
               const b = bucketFor(d.count);
+              if (!b) return null;
               return (
                 <View key={`${row}-${col}`} testID={`heat-tile-${d.count}`}
                   className="flex-1 h-10 rounded-xl items-center justify-center"

@@ -27,7 +27,7 @@ function isThemeMode(value: string | null): value is ThemeMode {
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [mode, setModeState] = useState<ThemeMode>('system');
   const [systemScheme, setSystemScheme] = useState<ColorSchemeName>(
-    Appearance.getColorScheme(),
+    (Appearance.getColorScheme() ?? 'light') as ColorSchemeName,
   );
 
   useEffect(() => {

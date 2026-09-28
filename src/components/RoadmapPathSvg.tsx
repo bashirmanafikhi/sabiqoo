@@ -20,7 +20,7 @@ export interface RoadmapPathSvgProps {
 export function RoadmapPathSvg({ paths, width = 400, height = 600 }: RoadmapPathSvgProps) {
   const all = useMemo(() => paths, [paths]);
   return (
-    <View pointerEvents="none" style={[StyleSheet.absoluteFillObject, { zIndex: 0 }]}>
+    <View pointerEvents="none" style={[StyleSheet.absoluteFill, { zIndex: 0 }]}>
       <Svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" fill="none">
         {all.map(p => (
           <React.Fragment key={p.id}>
