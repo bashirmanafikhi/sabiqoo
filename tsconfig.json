@@ -3,7 +3,10 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "lib": ["ES2022", "DOM"],
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
     "jsx": "react-native",
     "strict": true,
     "noUncheckedIndexedAccess": true,
@@ -18,10 +21,18 @@
     "allowJs": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@app/*": ["app/*"]
+      "@/*": [
+        "src/*"
+      ],
+      "@app/*": [
+        "app/*"
+      ]
     },
-    "types": ["jest", "react-native", "node"]
+    "types": [
+      "jest",
+      "react-native",
+      "node"
+    ]
   },
   "include": [
     "app/**/*",
@@ -35,5 +46,10 @@
     "expo-env.d.ts",
     "nativewind-env.d.ts"
   ],
-  "exclude": ["node_modules", ".expo", "dist"]
+  "exclude": [
+    "node_modules",
+    ".expo",
+    "dist"
+  ],
+  "extends": "expo/tsconfig.base"
 }
