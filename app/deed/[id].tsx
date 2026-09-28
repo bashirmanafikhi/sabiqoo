@@ -1,242 +1,95 @@
-import { useCallback, useMemo, useState } from 'react';
-import { Text, View } from 'react-native';
-import {
-  Stack,
-  useFocusEffect,
-  useLocalSearchParams,
-  useRouter,
-} from 'expo-router';
+import { useCallback, useState } from 'react';
+import { ScrollView, View, Text, Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { ConfettiOverlay } from '@/components/ConfettiOverlay';
 import { useColors } from '@/theme/tokens';
-import * as deedsRepo from '@/repos/deedsRepo';
-import * as logsRepo from '@/repos/logsRepo';
-import * as referencesRepo from '@/repos/referencesRepo';
-import * as categoriesRepo from '@/repos/categoriesRepo';
-import * as bookmarksRepo from '@/repos/bookmarksRepo';
-import * as skippedRepo from '@/repos/skippedRepo';
-import * as profileRepo from '@/repos/profileRepo';
-import { computeXpEarned } from '@/gamification/xp';
-import { levelFromXp } from '@/gamification/level';
-import { nextStreakOnLog } from '@/gamification/streak';
-import { success as hapticSuccess } from '@/utils/haptics';
-import { todayIso, nowIsoUtc } from '@/utils/dates';
-import type {
-  Deed,
-  Category,
-  DeedReference,
-  UserLog,
-  UserProfile,
-} from '@/db/schema';
+import { SegmentedControl } from '@/components/SegmentedControl';
+import { DeedHeader } from './_Header';
 import { TodayTab } from './_TodayTab';
 import { EvidenceTab } from './_EvidenceTab';
 import { HistoryTab } from './_HistoryTab';
-import { DeedHeader, DeedTabs, type TabKey } from './_Header';
-import { pickLocale, titleFor, type Locale } from './_helpers';
+
+type Tab = 'today' | 'evidence' | 'history';
 
 export default function DeedDetailScreen() {
-  const colors = useColors();
   const router = useRouter();
-  const params = useLocalSearchParams<{ id: string }>();
-  const idRaw = params.id;
-  const id = idRaw ? Number(idRaw) : NaN;
-  const { t, i18n } = useTranslation();
-  const locale: Locale = pickLocale(i18n.language);
+  const colors = useColors();
+  const { t } = useTranslation();
+  const [tab, setTab] = useState<Tab>('today');
+  const [notes, setNotes] = useState('Sent to Tariq before his morning bar exam!');
 
-  const [deed, setDeed] = useState<Deed | null>(null);
-  const [category, setCategory] = useState<Category | null>(null);
-  const [refs, setRefs] = useState<DeedReference[]>([]);
-  const [logs, setLogs] = useState<UserLog[]>([]);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [bookmarked, setBookmarked] = useState(false);
-  const [skipped, setSkipped] = useState(false);
-  const [tab, setTab] = useState<TabKey>('today');
-  const [qty, setQty] = useState(1);
-  const [busy, setBusy] = useState(false);
-  const [celebrate, setCelebrate] = useState<{ xp: number } | null>(null);
-
-  const today = useMemo(() => todayIso(), []);
-
-  const load = useCallback(async () => {
-    if (!Number.isFinite(id)) return;
-    const d = await deedsRepo.getById(id);
-    if (!d) {
-      setDeed(null);
-      return;
-    }
-    setDeed(d);
-    const [cats, r, l, p, bm, sk] = await Promise.all([
-      categoriesRepo.list(),
-      referencesRepo.listByDeed(id),
-      logsRepo.listByDeed(id),
-      profileRepo.get(),
-      bookmarksRepo.isBookmarked(id),
-      skippedRepo.isSkipped(id),
-    ]);
-    const cat = cats.find(c => c.id === d.categoryId) ?? null;
-    setCategory(cat);
-    setRefs(r);
-    setLogs(l);
-    setProfile(p);
-    setBookmarked(bm);
-    setSkipped(sk);
-  }, [id]);
-
-  useFocusEffect(
-    useCallback(() => {
-      load().catch(err => console.warn('[deed] load', err));
-    }, [load]),
-  );
-
-  const difficulty = useMemo(() => {
-    if (!deed) return 1 as 1 | 2 | 3;
-    if (deed.difficultyLevel === 2 || deed.difficultyLevel === 3) {
-      return deed.difficultyLevel as 2 | 3;
-    }
-    return 1 as 1;
-  }, [deed]);
-
-  const predictedXp = useMemo(() => {
-    if (!deed) return 0;
-    return computeXpEarned({
-      baseReward: deed.xpReward,
-      quantity: qty,
-      difficulty,
-    });
-  }, [deed, qty, difficulty]);
-
-  const onComplete = useCallback(async () => {
-    if (!deed || !profile || busy) return;
-    setBusy(true);
-    try {
-      const xpEarned = computeXpEarned({
-        baseReward: deed.xpReward,
-        quantity: qty,
-        difficulty,
-      });
-      await logsRepo.insert({
-        deedId: deed.id,
-        completedAt: nowIsoUtc(),
-        xpEarned,
-        quantity: qty,
-        dayBucket: today,
-      });
-      const next = nextStreakOnLog({
-        profile: {
-          current_streak: profile.currentStreak,
-          longest_streak: profile.longestStreak,
-          last_active_date: profile.lastActiveDate,
-          streak_freezes_left: profile.streakFreezesLeft,
-        },
-        dayBucket: today,
-      });
-      const newXp = profile.currentXp + xpEarned;
-      const newLevel = levelFromXp(newXp);
-      const updated: UserProfile = {
-        ...profile,
-        currentXp: newXp,
-        currentLevel: newLevel,
-        currentStreak: next.current_streak,
-        longestStreak: next.longest_streak,
-        lastActiveDate: next.last_active_date,
-        streakFreezesLeft: next.streak_freezes_left,
-      };
-      await profileRepo.upsert(updated);
-      setProfile(updated);
-      hapticSuccess();
-      setCelebrate({ xp: xpEarned });
-      setQty(1);
-      await load();
-    } finally {
-      setBusy(false);
-    }
-  }, [deed, profile, busy, qty, today, difficulty, load]);
-
-  const onToggleBookmark = useCallback(async () => {
-    if (!deed) return;
-    if (bookmarked) {
-      await bookmarksRepo.remove(deed.id);
-      setBookmarked(false);
-    } else {
-      await bookmarksRepo.add(deed.id);
-      setBookmarked(true);
-    }
-  }, [deed, bookmarked]);
-
-  const onToggleSkip = useCallback(async () => {
-    if (!deed) return;
-    if (skipped) {
-      await skippedRepo.unSkip(deed.id);
-      setSkipped(false);
-    } else {
-      await skippedRepo.skip(deed.id);
-      setSkipped(true);
-    }
-  }, [deed, skipped]);
-
-  if (!deed) {
-    return (
-      <View style={{ flex: 1, backgroundColor: colors.bg }}>
-        <Stack.Screen
-          options={{ title: t('home.title'), headerShown: false }}
-        />
-        <View
-          style={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Text className="text-base" style={{ color: colors.textMuted }}>
-            {t('common.loading')}
-          </Text>
-        </View>
-      </View>
-    );
-  }
+  const onComplete = useCallback(() => {
+    router.back();
+  }, [router]);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
-      <Stack.Screen
-        options={{ title: titleFor(deed, locale), headerShown: false }}
-      />
-      <DeedHeader
-        deed={deed}
-        bookmarked={bookmarked}
-        skipped={skipped}
-        onBack={() => router.back()}
-        onToggleBookmark={onToggleBookmark}
-        onToggleSkip={onToggleSkip}
-        locale={locale}
-      />
-      <DeedTabs tab={tab} onChange={setTab} />
-      {tab === 'today' ? (
-        <TodayTab
-          deed={deed}
-          category={category}
-          predictedXp={predictedXp}
-          onComplete={onComplete}
-          busy={busy}
-          locale={locale}
-        />
-      ) : tab === 'evidence' ? (
-        <EvidenceTab refs={refs} locale={locale} />
-      ) : (
-        <HistoryTab
-          deed={deed}
-          logs={logs}
-          locale={locale}
-          today={today}
-        />
-      )}
-      {celebrate ? (
-        <ConfettiOverlay
-          visible
-          xpEarned={celebrate.xp}
-          streak={profile?.currentStreak ?? 0}
-          onDone={() => setCelebrate(null)}
-        />
-      ) : null}
+      <DeedHeader onBack={() => router.back()} onBookmark={() => {}} onSkip={() => {}} />
+      <View className="px-gutter pt-3 pb-2">
+        <View className="px-3 py-1 rounded-full self-start flex-row items-center gap-1.5"
+          style={{ backgroundColor: '#1D2B3D1A' }}>
+          <Ionicons name="sparkles" size={15} color="#EA5455" />
+          <Text className="font-label-sm text-label-sm uppercase tracking-wider"
+            style={{ color: '#1D2B3D', fontWeight: '800' }}>
+            Day 14 Journey
+          </Text>
+        </View>
+      </View>
+
+      <View className="px-gutter mb-3">
+        <SegmentedControl<Tab> value={tab} onChange={setTab}
+          options={[
+            { value: 'today', label: t('deed.tabs.today'), leadingIcon: <Ionicons name="sunny" size={16} color={tab === 'today' ? '#FFFFFF' : '#1D2B3D'} /> },
+            { value: 'evidence', label: t('deed.tabs.evidence'), leadingIcon: <Ionicons name="book" size={16} color={tab === 'evidence' ? '#FFFFFF' : '#1D2B3D'} /> },
+            { value: 'history', label: t('deed.tabs.history'), leadingIcon: <Ionicons name="time" size={16} color={tab === 'history' ? '#FFFFFF' : '#1D2B3D'} /> },
+          ]} />
+      </View>
+
+      <ScrollView contentContainerStyle={{ paddingBottom: 96 }} keyboardShouldPersistTaps="handled">
+        {tab === 'today' ? (
+          <TodayTab
+            deedTitle="Send a Sincere Dua Text to a Friend"
+            deedTitleAr="دعاءٌ لأخيك بظهر الغيب برسالةٍ صادقة"
+            categoryTitle="Everyday Smiles & Kind Words"
+            xp={15}
+            notes={notes}
+            onChangeNotes={setNotes}
+            onComplete={onComplete}
+          />
+        ) : null}
+        {tab === 'evidence' ? (
+          <EvidenceTab
+            sourceTitle="Sahih Muslim 2732"
+            sourceCollection="Book of Dhikr, Dua & Repentance"
+            authenticityLabel="صحيح • Authentic"
+            arabicText="«مَا مِنْ عَبْدٍ مُسْلِمٍ يَدْعُو لأَخِيهِ بِظَهْرِ الْغَيْبِ إِلاَّ قَالَ الْمَلَكُ: وَلَكَ بِمِثْلٍ»"
+            englishTranslation="Abu Darda reported: The Messenger of Allah said, 'No Muslim servant prays for his brother in his absence but that an angel says: And to you the same.'"
+            lessonTitle="Key Lesson & Reflection"
+            lessonBody="Supplicating for another without their knowledge is free of social show and insincerity."
+            secondarySource="Sunan Abi Dawud 1534"
+            secondaryText="The fastest supplication to be answered is the prayer of someone for his brother in his absence."
+            calloutText="Who in your contacts list is quietly undergoing a hardship? A 10-word text can lift an entire mountain today."
+          />
+        ) : null}
+        {tab === 'history' ? (
+          <HistoryTab
+            allTimeLabel="All-Time Duas Sent"
+            allTimeValue="19"
+            allTimeSub="+4 this week"
+            xpLabel="Total Barakah XP"
+            xpValue="285"
+            xpSub="Silver Habit Tier"
+            entries={[
+              { when: 'Yesterday', text: 'Sent to Sister Mariam for good health', countLabel: 'Completed 1x', xp: '+15 XP' },
+              { when: '3 Days Ago • Shawwal 4', text: 'Group message to university study circle', countLabel: 'Completed 3x', xp: '+45 XP' },
+              { when: 'Last Friday • Jumu\'ah', text: 'Dua before Maghrib hour to cousin Zayd', countLabel: 'Completed 1x', xp: '+15 XP' },
+            ]}
+            streakLabel="Consistency Streak: 5 Days"
+            streakBody="Keep sending daily blessings to unlock the Kind Soul golden road trophy badge!"
+          />
+        ) : null}
+      </ScrollView>
     </View>
   );
 }
