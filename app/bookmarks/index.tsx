@@ -9,7 +9,6 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, useFocusEffect, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { DeedCard } from '@/components/DeedCard';
 import { AppTopBar } from '@/components/AppTopBar';
 import { Bilingual } from '@/components/Bilingual';
 import { useColors } from '@/theme/tokens';
@@ -120,29 +119,46 @@ export default function BookmarksScreen() {
     router.push('/settings');
   }, [router]);
 
-  const renderItem = ({ item }: ListRenderItemInfo<BookmarkRow>) => (
-    <View style={{ paddingHorizontal: 8, marginVertical: 6 }}>
-      <DeedCard
-        deed={{
-          id: item.deed.id,
-          title: titleFor(item.deed, locale),
-          category_color: item.category?.colorCode ?? '#EA5455',
-          xp_reward: item.deed.xpReward,
-          locked: false,
-          bookmarked: true,
-        }}
-        onPress={() => router.push(`/deed/${item.deed.id}`)}
-        onToggleBookmark={() => onToggleBookmark(item.deed.id)}
-        onToggleSkip={() => onToggleSkip(item.deed.id)}
-      />
-      <Text
-        className="ms-3 mt-1 text-xs"
-        style={{ color: colors.textMuted }}
-      >
-        {item.category ? categoryName(item.category, locale) : ''}
-      </Text>
-    </View>
-  );
+  const renderItem = ({ item }: ListRenderItemInfo<BookmarkRow>) => {
+    const title = titleFor(item.deed, locale);
+    const catName = item.category ? categoryName(item.category, locale) : '';
+    const stripeColor = item.category?.colorCode ?? '#EA5455';
+    const isSkipped = skippedIds.includes(item.deed.id);
+    return (
+      <View style={{ paddingHorizontal: 8, marginVertical: 6 }}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${title}, ${item.deed.xpReward} XP`}
+          onPress={() => router.push(`/deed/${item.deed.id}`)}
+          style={{
+            borderRadius: 14,
+            backgroundColor: colors.surfaceLowest,
+            borderWidth: 2,
+            borderColor: colors.border,
+            flexDirection: 'row',
+            overflow: 'hidden',
+          }}
+        >
+          <View style={{ width: 8, backgroundColor: stripeColor }} />
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', padding: 12 }}>
+            <View style={{ flex: 1 }}>
+              <Text className="text-base font-bold" style={{ color: colors.text }} numberOfLines={2}>{title}</Text>
+              <Text className="mt-1 text-xs" style={{ color: colors.textMuted }}>+{item.deed.xpReward} XP</Text>
+            </View>
+            <Pressable accessibilityRole="button" accessibilityLabel={t('bookmarks.added')} onPress={() => onToggleBookmark(item.deed.id)} hitSlop={8} style={{ marginStart: 8 }}>
+              <Ionicons name="heart" size={20} color="#EA5455" />
+            </Pressable>
+            <Pressable accessibilityRole="button" accessibilityLabel={t('skip.toggle')} onPress={() => onToggleSkip(item.deed.id)} hitSlop={8} style={{ marginStart: 8 }}>
+              <Ionicons name={isSkipped ? 'eye-outline' : 'eye-off-outline'} size={20} color={isSkipped ? '#F07B3F' : colors.textMuted} />
+            </Pressable>
+          </View>
+        </Pressable>
+        {catName ? (
+          <Text className="ms-3 mt-1 text-xs" style={{ color: colors.textMuted }}>{catName}</Text>
+        ) : null}
+      </View>
+    );
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg, paddingTop: 0 }}>

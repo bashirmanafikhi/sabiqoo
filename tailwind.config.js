@@ -31,18 +31,6 @@ module.exports = {
         'stripe-completed': '#F07B3F',
         'stripe-available': '#FFD460',
         'stripe-locked':    '#E1BFBC',
-        legacy: {
-          brand: { light: '#58CC02', dark: '#58CC02' },
-          'brand-dark': { light: '#58A700', dark: '#4A8E00' },
-          'brand-blue': { light: '#1CB0F6', dark: '#1CB0F6' },
-          'brand-blue-dark': { light: '#0E8FCE', dark: '#0E8FCE' },
-          'accent-gold': { light: '#FFC800', dark: '#FFC800' },
-          fire: { light: '#FF4D4D', dark: '#FF7A7A' },
-          'slate-blue': '#94A3B8',
-          locked: '#E5E5E5',
-          ink: '#1F1F1F',
-          paper: '#FFFFFF',
-        },
       },
       fontFamily: {
         sans:     ['PlusJakartaSans_500Medium', 'PlusJakartaSans_600SemiBold', 'PlusJakartaSans_700Bold', 'PlusJakartaSans_800ExtraBold'],
