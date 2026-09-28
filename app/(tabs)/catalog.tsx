@@ -1,290 +1,147 @@
-import { useCallback, useMemo, useState } from 'react';
-import {
-  FlatList,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-  type ListRenderItemInfo,
-} from 'react-native';
+import { useCallback, useState } from 'react';
+import { ScrollView, View, Text, TextInput, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Stack, useFocusEffect, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { DeedCard } from '@/components/DeedCard';
-import { ProgressBadge } from '@/components/ProgressBadge';
+import { AppTopBar } from '@/components/AppTopBar';
+import { CategoryChip } from '@/components/CategoryChip';
+import { CatalogDeedCard, type CatalogStatus } from '@/components/CatalogDeedCard';
 import { useColors } from '@/theme/tokens';
-import * as deedsRepo from '@/repos/deedsRepo';
-import * as logsRepo from '@/repos/logsRepo';
-import * as categoriesRepo from '@/repos/categoriesRepo';
-import * as bookmarksRepo from '@/repos/bookmarksRepo';
-import * as skippedRepo from '@/repos/skippedRepo';
-import type { Deed, Category } from '@/db/schema';
-import {
-  pickLocale,
-  titleFor,
-  descriptionFor,
-  categoryName,
-  computeUnlockedIds,
-  type Locale,
-} from '../_helpers';
 
-interface CatalogDeed {
-  deed: Deed;
-  category_color: string;
-  xp_reward: number;
-  locked: boolean;
-  bookmarked: boolean;
+function useCategories(): { categories: any[] } {
+  return { categories: [] };
+}
+function useDeeds(): { deeds: any[] } {
+  return { deeds: [] };
 }
 
 export default function CatalogScreen() {
-  const colors = useColors();
   const router = useRouter();
-  const { t, i18n } = useTranslation();
-  const locale: Locale = pickLocale(i18n.language);
+  const colors = useColors();
+  const { t } = useTranslation();
+  const { categories } = useCategories();
+  const { deeds } = useDeeds();
+  const [q, setQ] = useState('');
 
-  const [deeds, setDeeds] = useState<Deed[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [logCounts, setLogCounts] = useState<Record<number, number>>({});
-  const [bookmarkedIds, setBookmarkedIds] = useState<number[]>([]);
-  const [skippedIds, setSkippedIds] = useState<number[]>([]);
-  const [activeCategories, setActiveCategories] = useState<number[]>([]);
-  const [search, setSearch] = useState('');
-
-  const load = useCallback(async () => {
-    const [d, c, bm, sk] = await Promise.all([
-      deedsRepo.listAll(),
-      categoriesRepo.list(),
-      bookmarksRepo.listAll(),
-      skippedRepo.listAll(),
-    ]);
-    setDeeds(d);
-    setCategories(c);
-    setBookmarkedIds(bm);
-    setSkippedIds(sk);
-    const counts: Record<number, number> = {};
-    const logs = await logsRepo.listAll();
-    for (const l of logs) {
-      counts[l.deedId] = (counts[l.deedId] ?? 0) + 1;
-    }
-    setLogCounts(counts);
-  }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      load().catch(err => console.warn('[catalog] load', err));
-    }, [load]),
-  );
-
-  const categoryProgress = useMemo(() => {
-    const byCat: Record<number, { done: number; total: number }> = {};
-    for (const c of categories) byCat[c.id] = { done: 0, total: 0 };
-    for (const d of deeds) {
-      const bucket = byCat[d.categoryId];
-      if (!bucket) continue;
-      bucket.total += 1;
-      if ((logCounts[d.id] ?? 0) > 0) bucket.done += 1;
-    }
-    return byCat;
-  }, [deeds, categories, logCounts]);
-
-  const unlockedIds = useMemo(
-    () => computeUnlockedIds(deeds, logCounts, skippedIds),
-    [deeds, logCounts, skippedIds],
-  );
-
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    return deeds.filter(d => {
-      if (
-        activeCategories.length > 0 &&
-        !activeCategories.includes(d.categoryId)
-      ) {
-        return false;
-      }
-      if (q.length > 0) {
-        const haystack =
-          `${titleFor(d, locale)} ${descriptionFor(d, locale)}`.toLowerCase();
-        if (!haystack.includes(q)) return false;
-      }
-      return true;
-    });
-  }, [deeds, activeCategories, search, locale]);
-
-  const items: CatalogDeed[] = useMemo(() => {
-    const catById = new Map(categories.map(c => [c.id, c] as const));
-    return filtered.map(d => ({
-      deed: d,
-      category_color: catById.get(d.categoryId)?.colorCode ?? '#58CC02',
-      xp_reward: d.xpReward,
-      locked: !unlockedIds.has(d.id),
-      bookmarked: bookmarkedIds.includes(d.id),
-    }));
-  }, [filtered, categories, unlockedIds, bookmarkedIds]);
-
-  const onToggleCategory = useCallback((cid: number) => {
-    setActiveCategories(prev =>
-      prev.includes(cid) ? prev.filter(x => x !== cid) : [...prev, cid],
-    );
-  }, []);
-
-  const onToggleBookmark = useCallback(
-    async (id: number) => {
-      if (bookmarkedIds.includes(id)) {
-        await bookmarksRepo.remove(id);
-        setBookmarkedIds(prev => prev.filter(x => x !== id));
-      } else {
-        await bookmarksRepo.add(id);
-        setBookmarkedIds(prev => [...prev, id]);
-      }
-    },
-    [bookmarkedIds],
-  );
-
-  const onToggleSkip = useCallback(
-    async (id: number) => {
-      if (skippedIds.includes(id)) {
-        await skippedRepo.unSkip(id);
-        setSkippedIds(prev => prev.filter(x => x !== id));
-      } else {
-        await skippedRepo.skip(id);
-        setSkippedIds(prev => [...prev, id]);
-      }
-    },
-    [skippedIds],
-  );
-
-  const renderItem = ({ item }: ListRenderItemInfo<CatalogDeed>) => (
-    <DeedCard
-      deed={{
-        id: item.deed.id,
-        title: titleFor(item.deed, locale),
-        category_color: item.category_color,
-        xp_reward: item.xp_reward,
-        locked: item.locked,
-        bookmarked: item.bookmarked,
-      }}
-      onPress={() => router.push(`/deed/${item.deed.id}`)}
-      onToggleBookmark={() => onToggleBookmark(item.deed.id)}
-      onToggleSkip={() => onToggleSkip(item.deed.id)}
-    />
-  );
+  const onCardPress = useCallback((id: number) => router.push(`/deed/${id}` as any), [router]);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
-      <Stack.Screen
-        options={{ title: t('catalog.title'), headerShown: false }}
-      />
-      <View
-        style={{
-          paddingHorizontal: 16,
-          paddingVertical: 12,
-          backgroundColor: colors.bg,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.border,
-        }}
-      >
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            paddingHorizontal: 12,
-            paddingVertical: 8,
-            borderRadius: 12,
-            borderWidth: 2,
-            borderColor: colors.border,
-            backgroundColor: colors.elevated,
-          }}
-        >
-          <Ionicons name="search" size={20} color={colors.textMuted} />
-          <TextInput
-            value={search}
-            onChangeText={setSearch}
-            placeholder={t('catalog.searchPlaceholder')}
-            placeholderTextColor={colors.textMuted}
-            accessibilityLabel={t('catalog.searchPlaceholder')}
-            accessibilityHint={t('catalog.searchHint')}
-            style={{
-              flex: 1,
-              marginStart: 8,
-              color: colors.textPrimary,
-              fontSize: 16,
-            }}
-          />
-        </View>
-      </View>
+      <AppTopBar streakDays={7} xp={340} savedCount={4}
+        onSettings={() => router.push('/settings')}
+        onToggleLocale={() => router.push('/settings')}
+        onAvatar={() => router.push('/bookmarks')} />
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingHorizontal: 12,
-          paddingVertical: 12,
-          gap: 8,
-        }}
-      >
-        {categories.map(c => {
-          const active = activeCategories.includes(c.id);
-          const prog = categoryProgress[c.id] ?? { done: 0, total: 0 };
-          return (
-            <Pressable
-              key={c.id}
-              accessibilityRole="button"
-              accessibilityState={{ selected: active }}
-              onPress={() => onToggleCategory(c.id)}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                paddingHorizontal: 12,
-                paddingVertical: 8,
-                borderRadius: 999,
-                borderWidth: 2,
-                borderColor: active ? colors.ink : colors.border,
-                backgroundColor: active ? c.colorCode + '22' : colors.elevated,
-              }}
-            >
-              <Text
-                className="text-sm font-bold"
-                style={{ color: colors.textPrimary, marginEnd: 8 }}
-              >
-                {categoryName(c, locale)}
+      <ScrollView contentContainerStyle={{ paddingTop: 80, paddingBottom: 96 }} keyboardShouldPersistTaps="handled">
+        <View className="px-gutter pt-3 pb-2 gap-space-sm">
+          <View className="flex-row items-center w-full relative">
+            <Ionicons name="search" size={22} color={colors.outline}
+              style={{ position: 'absolute', left: 12, zIndex: 1 }} />
+            <TextInput value={q} onChangeText={setQ}
+              placeholder="Search 150+ deeds (e.g. smile, water, family)..."
+              placeholderTextColor={colors.outline}
+              className="w-full h-12 pl-11 pr-11 rounded-xl bg-surface"
+              style={{ color: colors.text }} />
+          </View>
+          <View className="flex-row items-center justify-between px-1">
+            <View className="flex-row items-center gap-1.5">
+              <View className="w-2 h-2 rounded-full" style={{ backgroundColor: '#EA5455' }} />
+              <Text className="font-label-md text-label-md" style={{ color: '#1D2B3DCC' }}>
+                Showing {deeds.length} of 152 deeds
               </Text>
-              <ProgressBadge
-                done={prog.done}
-                total={prog.total}
-                locale={locale}
-              />
+            </View>
+            <Pressable accessibilityRole="button" className="flex-row items-center gap-1">
+              <Ionicons name="options" size={16} color="#EA5455" />
+              <Text className="font-label-md text-label-md" style={{ color: '#EA5455', fontWeight: '800' }}>Filters</Text>
             </Pressable>
-          );
-        })}
-      </ScrollView>
-
-      {items.length === 0 ? (
-        <View
-          style={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 24,
-          }}
-        >
-          <Ionicons name="book-outline" size={48} color={colors.textMuted} />
-          <Text
-            className="mt-4 text-base"
-            style={{ color: colors.textMuted, textAlign: 'center' }}
-          >
-            {t('catalog.empty')}
-          </Text>
+          </View>
         </View>
-      ) : (
-        <FlatList
-          data={items}
-          renderItem={renderItem}
-          keyExtractor={(it: CatalogDeed) => String(it.deed.id)}
-          contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 6 }}
-          ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-        />
-      )}
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 16, gap: 8, paddingVertical: 4 }}>
+          <CategoryChip label="All Deeds" count={152} active onPress={() => {}} />
+          {categories.map((c: any, i: number) => (
+            <CategoryChip key={c.id}
+              label={c.titleEn}
+              count={`${c.completed ?? 0}/${c.total ?? 0}`}
+              progress={(c.completed ?? 0) / Math.max(1, c.total ?? 1)}
+              progressColor={i % 2 === 0 ? '#F07B3F' : '#EA5455'}
+              onPress={() => {}} />
+          ))}
+        </ScrollView>
+
+        <View className="mx-gutter mt-space-md">
+          <View className="rounded-2xl p-space-md"
+            style={{ backgroundColor: colors.surfaceLow, borderWidth: 1, borderColor: '#1D2B3D0D' }}>
+            <View className="flex-row items-start justify-between gap-space-sm">
+              <View className="flex-1 gap-1">
+                <View className="flex-row items-center gap-1.5">
+                  <Ionicons name="star" size={16} color="#F07B3F" />
+                  <Text className="font-label-sm text-label-sm uppercase tracking-wider"
+                    style={{ color: '#F07B3F', fontWeight: '800' }}>Active Realm</Text>
+                </View>
+                <Text className="font-headline text-headline-sm" style={{ color: '#1D2B3D' }}>Everyday Smiles & Kind Words</Text>
+                <Text className="font-arabic text-body-sm" dir="auto">الكلمة الطيبة والمعنوية</Text>
+              </View>
+              <View className="w-14 h-14 rounded-2xl items-center justify-center"
+                style={{ backgroundColor: '#FFD460',
+                  shadowColor: '#D8A82D', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 0 }}>
+                <Ionicons name="trophy" size={28} color="#1D2B3D" />
+              </View>
+            </View>
+            <View className="mt-space-md gap-1.5">
+              <View className="flex-row justify-between">
+                <Text className="font-label-sm text-label-sm" style={{ color: '#1D2B3D99' }}>Category Mastery Level 2</Text>
+                <Text className="font-label-sm text-label-sm" style={{ color: '#F07B3F', fontWeight: '800' }}>50% (6 / 12)</Text>
+              </View>
+              <View className="h-3 w-full rounded-full p-0.5" style={{ backgroundColor: colors.surfaceHighest }}>
+                <View className="h-full rounded-full" style={{ backgroundColor: '#F07B3F', width: '50%' }} />
+              </View>
+            </View>
+          </View>
+        </View>
+
+        <View className="px-gutter mt-space-md gap-space-sm">
+          {deeds.map((d: any) => (
+            <CatalogDeedCard
+              key={d.id}
+              title={d.title}
+              titleAr={d.titleAr}
+              status={mapStatus(d.state) as CatalogStatus}
+              statusLabel={d.statusLabel}
+              xp={d.xpLabel}
+              onPress={() => onCardPress(d.id)} />
+          ))}
+        </View>
+
+        {q.length > 0 && deeds.length === 0 ? (
+          <View className="mx-gutter mt-space-lg mb-2 items-center justify-center p-space-lg rounded-2xl"
+            style={{ backgroundColor: colors.surfaceLow, borderWidth: 1, borderColor: '#1D2B3D0D' }}>
+            <View className="w-16 h-16 rounded-full items-center justify-center mb-space-sm"
+              style={{ backgroundColor: colors.surfaceHighest }}>
+              <Ionicons name="search" size={32} color="#EA5455" />
+            </View>
+            <Text className="font-headline text-headline-sm" style={{ color: '#1D2B3D' }}>No deeds found for your search</Text>
+            <Text className="font-body text-body-md text-center mt-1 max-w-70" style={{ color: '#5B6E85' }}>
+              Try adjusting keywords, exploring other realms, or clearing active filters.
+            </Text>
+            <Pressable accessibilityRole="button" onPress={() => setQ('')}
+              className="mt-space-md h-10 px-space-lg rounded-xl items-center justify-center"
+              style={{ backgroundColor: '#EA5455',
+                shadowColor: '#C83E40', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 0 }}>
+              <Text className="font-label-md text-label-md text-white" style={{ fontWeight: '800' }}>Clear All Filters</Text>
+            </Pressable>
+          </View>
+        ) : null}
+      </ScrollView>
     </View>
   );
+}
+
+function mapStatus(s: string): CatalogStatus {
+  if (s === 'mastered') return 'mastered';
+  if (s === 'completed') return 'completed';
+  if (s === 'locked') return 'locked';
+  if (s === 'skipped') return 'skipped';
+  return 'available';
 }
