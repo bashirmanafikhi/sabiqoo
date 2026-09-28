@@ -10,20 +10,22 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#FFFFFF"
+      "backgroundColor": "#F8F9FF"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.bashirmanafikhi.sabiqoo",
-      "buildNumber": "1"
+      "buildNumber": "1",
+      "icon": "./assets/icon-192.png"
     },
     "android": {
       "package": "com.bashirmanafikhi.sabiqoo",
       "versionCode": 1,
+      "icon": "./assets/icon-512.png",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+        "backgroundColor": "#EA5455"
       }
     },
     "web": {

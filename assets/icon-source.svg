@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="coralGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF7A7A"/>
+      <stop offset="100%" stop-color="#EA5455"/>
+    </linearGradient>
+    <linearGradient id="tangGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F07B3F"/>
+      <stop offset="100%" stop-color="#CF6027"/>
+    </linearGradient>
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7FD47E"/>
+      <stop offset="100%" stop-color="#3FA653"/>
+    </linearGradient>
+    <filter id="bevel" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
+      <feOffset dx="0" dy="6"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.45"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <g transform="translate(512 540)" filter="url(#bevel)">
+    <path d="M 0 -260
+             C 130 -380, 360 -360, 360 -190
+             C 360 -60, 240 80, 0 260
+             C -240 80, -360 -60, -360 -190
+             C -360 -360, -130 -380, 0 -260 Z"
+          fill="url(#coralGrad)" stroke="#1D2B3D" stroke-width="14"/>
+
+    <path d="M 0 -180
+             C 80 -250, 220 -240, 240 -130
+             C 250 -40, 170 50, 0 180
+             C -170 50, -250 -40, -240 -130
+             C -220 -240, -80 -250, 0 -180 Z"
+          fill="#F8F9FF" opacity="0.95"/>
+
+    <g transform="translate(0 60)">
+      <path d="M -160 -20 Q -150 0 -110 12 L -40 18 L -34 22 Q -50 30 -100 30 Q -150 26 -160 -20 Z"
+            fill="#F2C8A6" stroke="#1D2B3D" stroke-width="8"/>
+      <path d="M -100 12 L -40 18 L -34 22" stroke="#1D2B3D" stroke-width="6" fill="none"/>
+      <line x1="-90" y1="-10" x2="-90" y2="18" stroke="#1D2B3D" stroke-width="4"/>
+      <line x1="-60" y1="-12" x2="-60" y2="18" stroke="#1D2B3D" stroke-width="4"/>
+      <line x1="-30" y1="-12" x2="-30" y2="18" stroke="#1D2B3D" stroke-width="4"/>
+    </g>
+
+    <g transform="translate(20 -60)">
+      <path d="M 0 60 Q 0 30 -6 0" stroke="#3FA653" stroke-width="10" fill="none" stroke-linecap="round"/>
+      <path d="M -6 0 Q -40 -10 -54 -42 Q -28 -52 -10 -28 Q -4 -10 -6 0 Z" fill="url(#leafGrad)" stroke="#1D2B3D" stroke-width="5"/>
+      <path d="M -6 -10 Q 24 -22 38 -56 Q 12 -64 -4 -38 Q 0 -22 -6 -10 Z" fill="url(#leafGrad)" stroke="#1D2B3D" stroke-width="5"/>
+    </g>
+
+    <g transform="translate(140 -40)">
+      <path d="M 0 0 L 220 -200 L 240 -180 L 30 30 Z"
+            fill="url(#tangGrad)" stroke="#1D2B3D" stroke-width="10" stroke-linejoin="round"/>
+      <path d="M 200 -210 L 290 -210 L 290 -120 L 240 -180 Z"
+            fill="url(#tangGrad)" stroke="#1D2B3D" stroke-width="10" stroke-linejoin="round"/>
+    </g>
+  </g>
+</svg>
