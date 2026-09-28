@@ -10,7 +10,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { Stack, useFocusEffect, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { DeedCard } from '@/components/DeedCard';
+import { AppTopBar } from '@/components/AppTopBar';
+import { Bilingual } from '@/components/Bilingual';
 import { useColors } from '@/theme/tokens';
+import { useLocale } from '@/i18n/LocaleProvider';
 import { getDb } from '@/db';
 import { userBookmarks, type Deed, type Category } from '@/db/schema';
 import * as deedsRepo from '@/repos/deedsRepo';
@@ -26,10 +29,6 @@ interface BookmarkRow {
   createdAt: string;
 }
 
-function pickLocale(lng: string | undefined): Locale {
-  return lng && lng.startsWith('ar') ? 'ar' : 'en';
-}
-
 function titleFor(deed: Deed, locale: Locale): string {
   return locale === 'ar' ? deed.titleAr : deed.titleEn;
 }
@@ -43,7 +42,8 @@ export default function BookmarksScreen() {
   const colors = useColors();
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  const locale: Locale = pickLocale(i18n.language);
+  const { locale: localeCtx, setLocale } = useLocale();
+  const locale: Locale = localeCtx ?? (i18n.language && i18n.language.startsWith('ar') ? 'ar' : 'en');
 
   const [rows, setRows] = useState<BookmarkRow[]>([]);
   const [bookmarkedIds, setBookmarkedIds] = useState<number[]>([]);
@@ -108,13 +108,25 @@ export default function BookmarksScreen() {
     }
   }, [skippedIds]);
 
+  const onToggleLocale = useCallback(() => {
+    setLocale(locale === 'ar' ? 'en' : 'ar').catch(err => console.warn('[bookmarks] locale', err));
+  }, [locale, setLocale]);
+
+  const onSettings = useCallback(() => {
+    router.push('/settings');
+  }, [router]);
+
+  const onAvatar = useCallback(() => {
+    router.push('/settings');
+  }, [router]);
+
   const renderItem = ({ item }: ListRenderItemInfo<BookmarkRow>) => (
     <View style={{ paddingHorizontal: 8, marginVertical: 6 }}>
       <DeedCard
         deed={{
           id: item.deed.id,
           title: titleFor(item.deed, locale),
-          category_color: item.category?.colorCode ?? '#58CC02',
+          category_color: item.category?.colorCode ?? '#EA5455',
           xp_reward: item.deed.xpReward,
           locked: false,
           bookmarked: true,
@@ -133,34 +145,21 @@ export default function BookmarksScreen() {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bg }}>
+    <View style={{ flex: 1, backgroundColor: colors.bg, paddingTop: 0 }}>
       <Stack.Screen options={{ title: t('bookmarks.title'), headerShown: false }} />
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          paddingHorizontal: 16,
-          paddingVertical: 12,
-          backgroundColor: colors.bg,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.border,
-        }}
-      >
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('common.close')}
-          onPress={() => router.back()}
-          hitSlop={8}
-          style={{ paddingHorizontal: 4 }}
-        >
-          <Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
-        </Pressable>
-        <Text
-          className="flex-1 ms-2 text-base font-bold"
-          style={{ color: colors.textPrimary }}
-        >
-          {t('bookmarks.title')}
-        </Text>
+      <AppTopBar
+        streakDays={7}
+        xp={340}
+        savedCount={rows.length}
+        onSettings={onSettings}
+        onToggleLocale={onToggleLocale}
+        onAvatar={onAvatar}
+      />
+      <View className="px-gutter pt-20 pb-2">
+        <Bilingual
+          primary={t('bookmarks.title')}
+          secondary={locale === 'ar' ? 'Saved Deeds' : 'المحفوظات'}
+        />
       </View>
 
       {rows.length === 0 ? (
@@ -189,11 +188,11 @@ export default function BookmarksScreen() {
               paddingVertical: 12,
               borderRadius: 12,
               borderWidth: 2,
-              borderColor: colors.ink,
-              backgroundColor: colors.brand,
+              borderColor: '#1D2B3D',
+              backgroundColor: '#EA5455',
             }}
           >
-            <Text className="text-base font-bold" style={{ color: colors.paper }}>
+            <Text className="text-base font-bold" style={{ color: '#FFFFFF' }}>
               {t('bookmarks.emptyCta')}
             </Text>
           </Pressable>
