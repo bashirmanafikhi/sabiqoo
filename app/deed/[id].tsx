@@ -30,7 +30,7 @@ export default function DeedDetailScreen() {
         <View className="px-3 py-1 rounded-full self-start flex-row items-center gap-1.5"
           style={{ backgroundColor: '#1D2B3D1A' }}>
           <Ionicons name="sparkles" size={15} color="#EA5455" />
-          <Text className="font-label-sm text-label-sm uppercase tracking-wider"
+          <Text className="font-label-sm text-label-sm uppercase"
             style={{ color: '#1D2B3D', fontWeight: '800' }}>
             Day 14 Journey
           </Text>
