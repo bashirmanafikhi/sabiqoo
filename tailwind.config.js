@@ -38,8 +38,8 @@ module.exports = {
         arabic:   ['Cairo_700Bold', 'Cairo_800ExtraBold', 'Cairo_900Black'],
       },
       borderRadius: {
-        sm: '0.25rem', DEFAULT: '0.5rem', md: '0.75rem',
-        lg: '1rem', xl: '1.5rem', full: '9999px', '4xl': '24px',
+        sm: 4, DEFAULT: 8, md: 12,
+        lg: 16, xl: 24, full: 9999, '4xl': 24,
       },
       spacing: {
         gutter: '1rem', 'gutter-mobile': '0.75rem',
