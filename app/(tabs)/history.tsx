@@ -29,7 +29,7 @@ export default function HistoryScreen() {
       <ScrollView contentContainerStyle={{ paddingTop: 80, paddingBottom: 96 }} className="px-gutter">
         <View className="flex-row items-center justify-between pt-1">
           <View>
-            <Text className="font-label-sm text-label-sm uppercase tracking-wider"
+            <Text className="font-label-sm text-label-sm uppercase"
               style={{ color: '#EA5455', fontWeight: '800' }}>سابقوا • Journey Log</Text>
             <Text className="font-headline text-headline-lg" style={{ color: '#1D2B3D' }}>Spiritual Footprint</Text>
           </View>

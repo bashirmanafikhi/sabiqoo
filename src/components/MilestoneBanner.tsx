@@ -15,7 +15,7 @@ export function MilestoneBanner({ title, body, progressLabel, progressPercent }:
         <View className="w-8 h-8 rounded-full items-center justify-center" style={{ backgroundColor: '#FFD460' }}>
           <Ionicons name="medal" size={20} color="#1D2B3D" />
         </View>
-        <Text className="font-label-md text-label-md uppercase tracking-wider"
+        <Text className="font-label-md text-label-md uppercase"
           style={{ color: '#FFD460', fontWeight: '800' }}>Next Milestone</Text>
       </View>
       <View className="gap-1">

@@ -48,7 +48,7 @@ export function EvidenceTab({
         </View>
 
         <View className="gap-1">
-          <Text className="font-headline text-xs uppercase tracking-wider"
+          <Text className="font-headline text-xs uppercase"
             style={{ color: '#F07B3F', fontWeight: '800' }}>Translation</Text>
           <Text className="font-body text-body-md leading-6" style={{ color: '#1D2B3D' }}>
             {englishTranslation}

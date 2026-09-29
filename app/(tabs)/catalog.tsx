@@ -77,7 +77,7 @@ export default function CatalogScreen() {
               <View className="flex-1 gap-1">
                 <View className="flex-row items-center gap-1.5">
                   <Ionicons name="star" size={16} color="#F07B3F" />
-                  <Text className="font-label-sm text-label-sm uppercase tracking-wider"
+                  <Text className="font-label-sm text-label-sm uppercase"
                     style={{ color: '#F07B3F', fontWeight: '800' }}>Active Realm</Text>
                 </View>
                 <Text className="font-headline text-headline-sm" style={{ color: '#1D2B3D' }}>Everyday Smiles & Kind Words</Text>

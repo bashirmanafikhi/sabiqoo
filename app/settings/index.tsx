@@ -19,7 +19,7 @@ interface SkippedRow { deed: Deed; category: Category | null; }
 
 function SectionHeader({ label }: { label: string }) {
   return (
-    <Text className="mb-2 mt-6 font-headline text-label-md uppercase tracking-wider"
+    <Text className="mb-2 mt-6 font-headline text-label-md uppercase"
       style={{ color: '#EA5455', fontWeight: '800' }}>{label}</Text>
   );
 }
