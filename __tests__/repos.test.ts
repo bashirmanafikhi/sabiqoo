@@ -1,14 +1,35 @@
-import { sql } from 'drizzle-orm';
-import * as schema from '@/db/schema';
+// Round-trip tests for the history repo against a real SQLite engine.
+// better-sqlite3 ships a native binding that must match the host Node ABI;
+// if it cannot be instantiated on this platform the suite skips gracefully.
+// The requires live inside the availability branch because jest runs even
+// skipped describe bodies while collecting tests.
 
 jest.mock('expo-sqlite', () => ({
   openDatabaseSync: jest.fn(),
 }));
 
-// better-sqlite3 ships a native binding (.node) that must match the host Node ABI.
-// On Windows + Node 26 the prebuilt binary is not published and Python is not
-// available, so we cannot build from source. The repo round-trip suite requires
-// a working SQLite engine; detect availability by attempting to instantiate one.
+jest.mock('@/db', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+  const Sqlite3 = require('better-sqlite3');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+  const { drizzle } = require('drizzle-orm/better-sqlite3');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+  const schema = require('@/db/schema');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+  const { MIGRATION_SQL } = require('@/db/migrate');
+
+  const sqlite = new Sqlite3(':memory:');
+  sqlite.pragma('foreign_keys = ON');
+  sqlite.exec(MIGRATION_SQL);
+  const db = drizzle(sqlite, { schema });
+
+  return {
+    getDb: () => db,
+    initDb: async () => {},
+    __sqlite: sqlite,
+  };
+});
+
 const betterSqlite3Available = (() => {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
@@ -21,365 +42,122 @@ const betterSqlite3Available = (() => {
   }
 })();
 
-jest.mock('@/db', () => {
+if (!betterSqlite3Available) {
+  test.skip('history repo suite needs the better-sqlite3 native binding (unavailable on this platform)', () => {});
+} else {
   // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-  const mockSqlite3 = require('better-sqlite3');
+  const historyRepo = require('@/repos/historyRepo');
   // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-  const { drizzle: mockDrizzle } = require('drizzle-orm/better-sqlite3');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-  const mockSchema = require('@/db/schema');
+  const { __sqlite } = require('@/db');
 
-  const mockMigrationSql = `
-CREATE TABLE units (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  title_ar TEXT NOT NULL,
-  title_en TEXT NOT NULL,
-  sort_order INTEGER NOT NULL
-);
+  const sadaqah = { key: 'ch-sadaqah-little', titleAr: 'تصدّق ولو بالقليل', titleEn: 'Give charity, even a little' };
 
-CREATE TABLE categories (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name_ar TEXT NOT NULL,
-  name_en TEXT NOT NULL,
-  icon_name TEXT NOT NULL,
-  color_code TEXT NOT NULL,
-  unit_id INTEGER,
-  sort_order INTEGER NOT NULL DEFAULT 0
-);
-CREATE INDEX idx_categories_unit_id ON categories(unit_id);
+  describe('history repo', () => {
+    test('add allows redoing the same deed the same day', async () => {
+      expect(await historyRepo.add({ ...sadaqah, day: '2026-10-03' })).toBe(true);
+      expect(await historyRepo.isDone(sadaqah.key, '2026-10-03')).toBe(true);
+      // Same deed, same day → logged again, history keeps both.
+      expect(await historyRepo.add({ ...sadaqah, day: '2026-10-03' })).toBe(true);
+      expect(await historyRepo.total()).toBe(2);
+    });
 
-CREATE TABLE deeds (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  slug TEXT UNIQUE NOT NULL,
-  category_id INTEGER NOT NULL REFERENCES categories(id),
-  unit_id INTEGER NOT NULL REFERENCES units(id),
-  title_ar TEXT NOT NULL,
-  title_en TEXT NOT NULL,
-  description_ar TEXT NOT NULL,
-  description_en TEXT NOT NULL,
-  xp_reward INTEGER NOT NULL DEFAULT 10,
-  difficulty_level INTEGER NOT NULL DEFAULT 1,
-  branch_group INTEGER NOT NULL DEFAULT 1,
-  is_repeatable INTEGER NOT NULL DEFAULT 1,
-  sort_order INTEGER NOT NULL DEFAULT 0
-);
-CREATE INDEX idx_deeds_category_id ON deeds(category_id);
-CREATE INDEX idx_deeds_unit_id ON deeds(unit_id);
-CREATE INDEX idx_deeds_branch_group ON deeds(unit_id, branch_group);
+    test('the same deed can be completed again on another day', async () => {
+      expect(await historyRepo.add({ ...sadaqah, day: '2026-10-01' })).toBe(true);
+      expect(await historyRepo.add({ ...sadaqah, day: '2026-10-02' })).toBe(true);
+    });
 
-CREATE TABLE user_logs (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  deed_id INTEGER NOT NULL REFERENCES deeds(id),
-  completed_at TEXT NOT NULL DEFAULT (datetime('now')),
-  xp_earned INTEGER NOT NULL,
-  quantity INTEGER NOT NULL DEFAULT 1,
-  note TEXT,
-  day_bucket TEXT NOT NULL
-);
-CREATE INDEX idx_user_logs_day_bucket ON user_logs(day_bucket);
-CREATE INDEX idx_user_logs_deed_id ON user_logs(deed_id);
+    test('no unique index blocks a same-day redo', async () => {
+      await historyRepo.add({ ...sadaqah, day: '2026-10-03' });
+      expect(() =>
+        __sqlite.prepare('INSERT INTO history (key, day) VALUES (?, ?)').run(sadaqah.key, '2026-10-03'),
+      ).not.toThrow();
+    });
 
-CREATE TABLE user_profile (
-  id INTEGER PRIMARY KEY CHECK (id = 1),
-  current_xp INTEGER NOT NULL DEFAULT 0,
-  current_level INTEGER NOT NULL DEFAULT 1,
-  current_streak INTEGER NOT NULL DEFAULT 0,
-  longest_streak INTEGER NOT NULL DEFAULT 0,
-  last_active_date TEXT,
-  streak_freezes_left INTEGER NOT NULL DEFAULT 2
-);
+    test('countsForDay counts every completion per key', async () => {
+      await historyRepo.add({ ...sadaqah, day: '2026-10-03' });
+      await historyRepo.add({ ...sadaqah, day: '2026-10-03' });
+      await historyRepo.add({ key: 'fam-call-parents', titleAr: 'اتصال', titleEn: 'Call', day: '2026-10-03' });
+      await historyRepo.add({ ...sadaqah, day: '2026-10-02' });
 
-CREATE TABLE user_bookmarks (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  deed_id INTEGER NOT NULL UNIQUE REFERENCES deeds(id) ON DELETE CASCADE,
-  created_at TEXT NOT NULL DEFAULT (datetime('now'))
-);
-CREATE INDEX idx_user_bookmarks_deed_id ON user_bookmarks(deed_id);
+      const counts = await historyRepo.countsForDay('2026-10-03');
+      expect(counts.get(sadaqah.key)).toBe(2);
+      expect(counts.get('fam-call-parents')).toBe(1);
+    });
 
-CREATE TABLE user_skipped (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  deed_id INTEGER NOT NULL UNIQUE REFERENCES deeds(id) ON DELETE CASCADE,
-  skipped_at TEXT NOT NULL DEFAULT (datetime('now'))
-);
-CREATE INDEX idx_user_skipped_deed_id ON user_skipped(deed_id);
+    test('countsAll counts completions per key across all days', async () => {
+      await historyRepo.add({ ...sadaqah, day: '2026-10-01' });
+      await historyRepo.add({ ...sadaqah, day: '2026-10-03' });
+      await historyRepo.add({ key: 'fam-call-parents', titleAr: 'اتصال', titleEn: 'Call', day: '2026-10-02' });
 
-CREATE TABLE deed_references (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  deed_id INTEGER NOT NULL REFERENCES deeds(id) ON DELETE CASCADE,
-  type TEXT NOT NULL CHECK (type IN ('quran','hadith','athkar')),
-  text_ar TEXT NOT NULL,
-  text_en TEXT,
-  source TEXT NOT NULL,
-  narrator TEXT,
-  lesson_ar TEXT,
-  lesson_en TEXT,
-  sort_order INTEGER NOT NULL DEFAULT 0
-);
-CREATE INDEX idx_deed_references_deed_id ON deed_references(deed_id);
-`;
+      const counts = await historyRepo.countsAll();
+      expect(counts.get(sadaqah.key)).toBe(2);
+      expect(counts.get('fam-call-parents')).toBe(1);
+    });
 
-  let mockCachedDb: any = null;
-  return {
-    getDb: () => {
-      if (mockCachedDb) return mockCachedDb;
-      const sqlite = new mockSqlite3(':memory:');
-      sqlite.pragma('foreign_keys = ON');
-      sqlite.exec(mockMigrationSql);
-      mockCachedDb = mockDrizzle(sqlite, { schema: mockSchema });
-      return mockCachedDb;
-    },
-    initDb: async () => {},
-    runMigrations: async () => {},
-  };
-});
+    test('removeLatest deletes the newest entry overall (uncheck)', async () => {
+      await historyRepo.add({ ...sadaqah, day: '2026-10-01' });
+      await historyRepo.add({ ...sadaqah, day: '2026-10-03' });
+      await historyRepo.add({ ...sadaqah, day: '2026-10-03' });
 
-import * as deedsRepo from '@/repos/deedsRepo';
-import * as logsRepo from '@/repos/logsRepo';
-import * as bookmarksRepo from '@/repos/bookmarksRepo';
-import * as skippedRepo from '@/repos/skippedRepo';
-import * as unitsRepo from '@/repos/unitsRepo';
-import * as categoriesRepo from '@/repos/categoriesRepo';
-import * as profileRepo from '@/repos/profileRepo';
-import * as referencesRepo from '@/repos/referencesRepo';
-import { getDb } from '@/db';
+      await historyRepo.removeLatest(sadaqah.key);
+      expect(await historyRepo.total()).toBe(2);
+      expect(await historyRepo.isDone(sadaqah.key, '2026-10-03')).toBe(true);
 
-function seedBasics() {
-  const db = getDb();
-  db.insert(schema.units)
-    .values([
-      { titleAr: 'وحدة ١', titleEn: 'Unit 1', sortOrder: 1 },
-      { titleAr: 'وحدة ٢', titleEn: 'Unit 2', sortOrder: 2 },
-    ])
-    .run();
-  db.insert(schema.categories)
-    .values([
-      {
-        nameAr: 'صدقة',
-        nameEn: 'Charity',
-        iconName: 'Heart',
-        colorCode: '#58CC02',
-        unitId: 1,
-        sortOrder: 1,
-      },
-    ])
-    .run();
-  db.insert(schema.deeds)
-    .values([
-      {
-        slug: 'smile-1',
-        categoryId: 1,
-        unitId: 1,
-        titleAr: 'ابتسم',
-        titleEn: 'Smile',
-        descriptionAr: 'ابتسم لأخيك',
-        descriptionEn: 'Smile at your brother',
-        xpReward: 10,
-        difficultyLevel: 1,
-        branchGroup: 1,
-        isRepeatable: 1,
-        sortOrder: 1,
-      },
-      {
-        slug: 'salam-1',
-        categoryId: 1,
-        unitId: 1,
-        titleAr: 'السلام',
-        titleEn: 'Say Salam',
-        descriptionAr: 'ألقِ السلام',
-        descriptionEn: 'Greet with Salam',
-        xpReward: 10,
-        difficultyLevel: 1,
-        branchGroup: 1,
-        isRepeatable: 1,
-        sortOrder: 2,
-      },
-      {
-        slug: 'charity-1',
-        categoryId: 1,
-        unitId: 1,
-        titleAr: 'صدقة',
-        titleEn: 'Give charity',
-        descriptionAr: 'تصدق',
-        descriptionEn: 'Give charity',
-        xpReward: 20,
-        difficultyLevel: 2,
-        branchGroup: 2,
-        isRepeatable: 1,
-        sortOrder: 3,
-      },
-    ])
-    .run();
+      await historyRepo.removeLatest(sadaqah.key);
+      await historyRepo.removeLatest(sadaqah.key);
+      expect(await historyRepo.total()).toBe(0);
+      expect(await historyRepo.isDone(sadaqah.key, '2026-10-01')).toBe(false);
+    });
+
+    test('titles are snapshotted at completion time', async () => {
+      await historyRepo.add({ ...sadaqah, day: '2026-10-03' });
+      const rows = await historyRepo.listAll();
+      expect(rows[0]?.titleAr).toBe('تصدّق ولو بالقليل');
+      expect(rows[0]?.titleEn).toBe('Give charity, even a little');
+    });
+
+    test('doneKeysForDay returns the keys logged that day', async () => {
+      await historyRepo.add({ ...sadaqah, day: '2026-10-03' });
+      await historyRepo.add({ key: 'fam-call-parents', titleAr: 'اتصال', titleEn: 'Call', day: '2026-10-03' });
+      await historyRepo.add({ key: 'nat-plant-tree', titleAr: 'غرس', titleEn: 'Plant', day: '2026-10-02' });
+
+      const keys = await historyRepo.doneKeysForDay('2026-10-03');
+      expect(keys.has(sadaqah.key)).toBe(true);
+      expect(keys.has('fam-call-parents')).toBe(true);
+      expect(keys.has('nat-plant-tree')).toBe(false);
+    });
+
+    test('listAll is newest first', async () => {
+      await historyRepo.add({ ...sadaqah, day: '2026-10-01' });
+      await historyRepo.add({ ...sadaqah, day: '2026-10-03' });
+      await historyRepo.add({ ...sadaqah, day: '2026-10-02' });
+
+      const days = (await historyRepo.listAll()).map((r: { day: string }) => r.day);
+      expect(days).toEqual(['2026-10-03', '2026-10-02', '2026-10-01']);
+    });
+
+    test('total counts every logged completion', async () => {
+      await historyRepo.add({ ...sadaqah, day: '2026-10-01' });
+      await historyRepo.add({ ...sadaqah, day: '2026-10-02' });
+      expect(await historyRepo.total()).toBe(2);
+    });
+
+    test('remove deletes only the latest (key, day) entry', async () => {
+      await historyRepo.add({ ...sadaqah, day: '2026-10-03' });
+      await historyRepo.add({ ...sadaqah, day: '2026-10-03' });
+      await historyRepo.remove(sadaqah.key, '2026-10-03');
+      expect(await historyRepo.isDone(sadaqah.key, '2026-10-03')).toBe(true);
+      await historyRepo.remove(sadaqah.key, '2026-10-03');
+      expect(await historyRepo.isDone(sadaqah.key, '2026-10-03')).toBe(false);
+      expect(await historyRepo.total()).toBe(0);
+    });
+
+    test('removeAll wipes the history (Settings reset)', async () => {
+      await historyRepo.add({ ...sadaqah, day: '2026-10-01' });
+      await historyRepo.add({ ...sadaqah, day: '2026-10-02' });
+      await historyRepo.removeAll();
+      expect(await historyRepo.total()).toBe(0);
+      expect(await historyRepo.listAll()).toEqual([]);
+    });
+  });
 }
-
-describe('repos', () => {
-  if (!betterSqlite3Available) {
-    test.skip('better-sqlite3 native binding unavailable on this platform; rebuild via `npm rebuild better-sqlite3` (requires Python on Windows) or run `npm run seed` after switching to a Node version with a published prebuilt', () => {});
-    return;
-  }
-
-  test('unitsRepo.list returns seeded units sorted', async () => {
-    seedBasics();
-    const list = await unitsRepo.list();
-    expect(list).toHaveLength(2);
-    expect(list[0]?.sortOrder).toBe(1);
-    expect(list[1]?.sortOrder).toBe(2);
-  });
-
-  test('categoriesRepo.listByUnit filters correctly', async () => {
-    seedBasics();
-    const list = await categoriesRepo.listByUnit(1);
-    expect(list).toHaveLength(1);
-    expect(list[0]?.nameEn).toBe('Charity');
-    const none = await categoriesRepo.listByUnit(99);
-    expect(none).toHaveLength(0);
-  });
-
-  test('deedsRepo round-trips insert and listAll', async () => {
-    seedBasics();
-    const all = await deedsRepo.listAll();
-    expect(all).toHaveLength(3);
-    const smile = await deedsRepo.getById(1);
-    expect(smile?.slug).toBe('smile-1');
-  });
-
-  test('logsRepo.insert then listByDeed returns log', async () => {
-    seedBasics();
-    await logsRepo.insert({
-      deedId: 1,
-      xpEarned: 10,
-      quantity: 1,
-      dayBucket: '2026-09-26',
-    });
-    const logs = await logsRepo.listByDeed(1);
-    expect(logs).toHaveLength(1);
-    expect(logs[0]?.deedId).toBe(1);
-    expect(logs[0]?.dayBucket).toBe('2026-09-26');
-  });
-
-  test('logsRepo.countByDay groups by day_bucket', async () => {
-    seedBasics();
-    await logsRepo.insert({
-      deedId: 1,
-      xpEarned: 10,
-      dayBucket: '2026-09-26',
-    });
-    await logsRepo.insert({
-      deedId: 2,
-      xpEarned: 10,
-      dayBucket: '2026-09-26',
-    });
-    await logsRepo.insert({
-      deedId: 3,
-      xpEarned: 20,
-      dayBucket: '2026-09-25',
-    });
-    const rows = await logsRepo.countByDay('2026-09-25', '2026-09-26');
-    const day26 = rows.find((r) => r.day_bucket === '2026-09-26');
-    const day25 = rows.find((r) => r.day_bucket === '2026-09-25');
-    expect(day26?.count).toBe(2);
-    expect(day25?.count).toBe(1);
-  });
-
-  test('logsRepo.countByCategory groups by category_id', async () => {
-    seedBasics();
-    await logsRepo.insert({
-      deedId: 1,
-      xpEarned: 10,
-      dayBucket: '2026-09-26',
-    });
-    await logsRepo.insert({
-      deedId: 2,
-      xpEarned: 10,
-      dayBucket: '2026-09-26',
-    });
-    const rows = await logsRepo.countByCategory();
-    expect(rows).toHaveLength(1);
-    expect(rows[0]?.category_id).toBe(1);
-    expect(rows[0]?.count).toBe(2);
-  });
-
-  test('bookmarksRepo unique constraint: add twice → still 1 row', async () => {
-    seedBasics();
-    await bookmarksRepo.add(1);
-    await bookmarksRepo.add(1);
-    const all = await bookmarksRepo.listAll();
-    expect(all).toEqual([1]);
-    expect(await bookmarksRepo.isBookmarked(1)).toBe(true);
-    await bookmarksRepo.remove(1);
-    expect(await bookmarksRepo.isBookmarked(1)).toBe(false);
-  });
-
-  test('skippedRepo cascade: delete deed → user_skipped row gone', async () => {
-    seedBasics();
-    await skippedRepo.skip(1);
-    expect(await skippedRepo.listAll()).toEqual([1]);
-    const db = getDb();
-    db.delete(schema.deeds).where(sql`id = 1`).run();
-    expect(await skippedRepo.listAll()).toEqual([]);
-  });
-
-  test('profileRepo.get returns default row on first call', async () => {
-    const p = await profileRepo.get();
-    expect(p.id).toBe(1);
-    expect(p.currentXp).toBe(0);
-    expect(p.streakFreezesLeft).toBe(2);
-  });
-
-  test('profileRepo.upsert then get returns updated values', async () => {
-    await profileRepo.upsert({
-      id: 1,
-      currentXp: 250,
-      currentLevel: 3,
-      currentStreak: 5,
-      longestStreak: 7,
-      lastActiveDate: '2026-09-26',
-      streakFreezesLeft: 1,
-    });
-    const p = await profileRepo.get();
-    expect(p.currentXp).toBe(250);
-    expect(p.currentStreak).toBe(5);
-    expect(p.longestStreak).toBe(7);
-  });
-
-  test('referencesRepo.listByDeed filters and orders', async () => {
-    seedBasics();
-    const db = getDb();
-    db.insert(schema.deedReferences)
-      .values([
-        {
-          deedId: 1,
-          type: 'quran',
-          textAr: 'آية',
-          source: 'Surah 1:1',
-          sortOrder: 2,
-        },
-        {
-          deedId: 1,
-          type: 'hadith',
-          textAr: 'حديث',
-          source: 'Bukhari 1',
-          sortOrder: 1,
-        },
-        {
-          deedId: 2,
-          type: 'athkar',
-          textAr: 'ذكر',
-          source: 'Morning',
-          sortOrder: 1,
-        },
-      ])
-      .run();
-    const list = await referencesRepo.listByDeed(1);
-    expect(list).toHaveLength(2);
-    expect(list[0]?.sortOrder).toBe(1);
-    expect(list[1]?.sortOrder).toBe(2);
-  });
-
-  test('deedsRepo.unlockedIds: first deed unlocked, others locked until prereq done', async () => {
-    seedBasics();
-    const unlockedFirst = await deedsRepo.unlockedIds(1, [], []);
-    expect(unlockedFirst).toEqual([1]);
-    const unlockedAfter = await deedsRepo.unlockedIds(1, [1], []);
-    expect(unlockedAfter.sort()).toEqual([1, 2]);
-  });
-});

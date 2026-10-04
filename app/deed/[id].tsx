@@ -1,95 +1,245 @@
 import { useCallback, useState } from 'react';
-import { ScrollView, View, Text, Pressable } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useColors } from '@/theme/tokens';
-import { SegmentedControl } from '@/components/SegmentedControl';
-import { DeedHeader } from './_Header';
-import { TodayTab } from './_TodayTab';
-import { EvidenceTab } from './_EvidenceTab';
-import { HistoryTab } from './_HistoryTab';
+import { useLocale } from '@/i18n/LocaleProvider';
+import { Toast } from '@/components/Toast';
+import { Button3D } from '@/components/Button3D';
+import { categoryById, deedDesc, deedTitle, suggestionByKey } from '@/content/catalog';
+import type { HistoryEntry } from '@/db/schema';
+import * as historyRepo from '@/repos/historyRepo';
+import { todayIso, yesterdayIso } from '@/utils/dates';
+import * as haptics from '@/utils/haptics';
 
-type Tab = 'today' | 'evidence' | 'history';
+function parseDay(day: string): Date {
+  const parts = day.split('-').map(Number);
+  const y = parts[0] ?? 1970;
+  const m = parts[1] ?? 1;
+  const d = parts[2] ?? 1;
+  return new Date(y, m - 1, d);
+}
 
-export default function DeedDetailScreen() {
-  const router = useRouter();
+/** createdAt is stored as UTC 'YYYY-MM-DD HH:MM:SS'; returns a local Date or null. */
+function parseCreatedAt(value: string): Date | null {
+  const parsed = new Date(value.includes('T') ? value : `${value.replace(' ', 'T')}Z`);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+export default function DeedScreen() {
   const colors = useColors();
   const { t } = useTranslation();
-  const [tab, setTab] = useState<Tab>('today');
-  const [notes, setNotes] = useState('Sent to Tariq before his morning bar exam!');
+  const { locale } = useLocale();
+  const router = useRouter();
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const deedKey = typeof id === 'string' ? id : '';
 
-  const onComplete = useCallback(() => {
-    router.back();
-  }, [router]);
+  const deed = suggestionByKey(deedKey);
+
+  const [timesDone, setTimesDone] = useState(0);
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    if (!deed) return;
+    const [counts, all] = await Promise.all([
+      historyRepo.countsAll(),
+      historyRepo.listAll(),
+    ]);
+    setTimesDone(counts.get(deedKey) ?? 0);
+    setHistory(all.filter((e) => e.key === deedKey));
+  }, [deed, deedKey]);
+
+  useFocusEffect(
+    useCallback(() => {
+      load().catch(() => {});
+    }, [load]),
+  );
+
+  const mark = useCallback(
+    async (done: boolean) => {
+      if (!deed) return;
+      const day = todayIso();
+      if (done) {
+        setTimesDone((n) => n + 1);
+        haptics.success();
+        setToastMsg(t('toast.celebrate'));
+        try {
+          await historyRepo.add({ key: deed.key, titleAr: deed.ar, titleEn: deed.en, day });
+        } catch {}
+      } else {
+        setTimesDone((n) => Math.max(0, n - 1));
+        haptics.light();
+        try {
+          await historyRepo.removeLatest(deed.key);
+        } catch {}
+      }
+      load().catch(() => {});
+    },
+    [deed, load, t],
+  );
+
+  if (!deed) {
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.bg }}>
+        <SafeAreaView edges={['top']} style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+          <Ionicons name="help-circle-outline" size={48} color={colors.textMuted} />
+          <Text className="font-body text-body-md" style={{ color: colors.textMuted }}>
+            {t('notFound.title')}
+          </Text>
+          <Button3D label={t('common.back')} variant="coral" onPress={() => router.back()} />
+        </SafeAreaView>
+      </View>
+    );
+  }
+
+  const cat = categoryById(deed.category);
+  const isDone = timesDone > 0;
+  const headingFont = locale === 'ar' ? 'font-arabic' : 'font-headline';
+
+  function dayLabel(day: string): string {
+    if (day === todayIso()) return t('history.today');
+    if (day === yesterdayIso()) return t('history.yesterday');
+    try {
+      return new Intl.DateTimeFormat(locale === 'ar' ? 'ar' : 'en-US', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+      }).format(parseDay(day));
+    } catch {
+      return day;
+    }
+  }
+
+  function timeOf(entry: HistoryEntry): string {
+    const date = parseCreatedAt(entry.createdAt);
+    if (!date) return '';
+    try {
+      return new Intl.DateTimeFormat(locale === 'ar' ? 'ar' : 'en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+      }).format(date);
+    } catch {
+      return '';
+    }
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
-      <DeedHeader onBack={() => router.back()} onBookmark={() => {}} onSkip={() => {}} />
-      <View className="px-gutter pt-3 pb-2">
-        <View className="px-3 py-1 rounded-full self-start flex-row items-center gap-1.5"
-          style={{ backgroundColor: '#1D2B3D1A' }}>
-          <Ionicons name="sparkles" size={15} color="#EA5455" />
-          <Text className="font-label-sm text-label-sm uppercase"
-            style={{ color: '#1D2B3D', fontWeight: '800' }}>
-            Day 14 Journey
-          </Text>
+      <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+        {/* Header */}
+        <View className="flex-row items-center gap-2 px-4 pt-3 pb-2">
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('common.back')}
+            testID="deed-back"
+            onPress={() => router.back()}
+            hitSlop={8}
+            className="items-center justify-center rounded-full"
+            style={{ width: 38, height: 38, backgroundColor: colors.surface }}
+          >
+            <Ionicons name={locale === 'ar' ? 'arrow-forward' : 'arrow-back'} size={20} color={colors.text} />
+          </Pressable>
+          {cat ? (
+            <View
+              className="flex-row items-center gap-1.5 px-3 py-1.5 rounded-full"
+              style={{ backgroundColor: colors.surface }}
+            >
+              <Ionicons name={cat.icon as keyof typeof Ionicons.glyphMap} size={14} color={colors.textMuted} />
+              <Text className="font-label-sm text-label-sm" style={{ color: colors.textMuted }}>
+                {locale === 'ar' ? cat.ar : cat.en}
+              </Text>
+            </View>
+          ) : null}
         </View>
-      </View>
 
-      <View className="px-gutter mb-3">
-        <SegmentedControl<Tab> value={tab} onChange={setTab}
-          options={[
-            { value: 'today', label: t('deed.tabs.today'), leadingIcon: <Ionicons name="sunny" size={16} color={tab === 'today' ? '#FFFFFF' : '#1D2B3D'} /> },
-            { value: 'evidence', label: t('deed.tabs.evidence'), leadingIcon: <Ionicons name="book" size={16} color={tab === 'evidence' ? '#FFFFFF' : '#1D2B3D'} /> },
-            { value: 'history', label: t('deed.tabs.history'), leadingIcon: <Ionicons name="time" size={16} color={tab === 'history' ? '#FFFFFF' : '#1D2B3D'} /> },
-          ]} />
-      </View>
+        <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 32, gap: 14 }}>
+          {/* Title + description */}
+          <View className="gap-2">
+            <Text dir="auto" className={`${headingFont} text-headline-lg`} style={{ color: colors.text }}>
+              {deedTitle(deed, locale)}
+            </Text>
+            <Text dir="auto" className="font-body text-body-md" style={{ color: colors.textMuted }}>
+              {deedDesc(deed, locale)}
+            </Text>
+          </View>
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 96 }} keyboardShouldPersistTaps="handled">
-        {tab === 'today' ? (
-          <TodayTab
-            deedTitle="Send a Sincere Dua Text to a Friend"
-            deedTitleAr="دعاءٌ لأخيك بظهر الغيب برسالةٍ صادقة"
-            categoryTitle="Everyday Smiles & Kind Words"
-            xp={15}
-            notes={notes}
-            onChangeNotes={setNotes}
-            onComplete={onComplete}
-          />
-        ) : null}
-        {tab === 'evidence' ? (
-          <EvidenceTab
-            sourceTitle="Sahih Muslim 2732"
-            sourceCollection="Book of Dhikr, Dua & Repentance"
-            authenticityLabel="صحيح • Authentic"
-            arabicText="«مَا مِنْ عَبْدٍ مُسْلِمٍ يَدْعُو لأَخِيهِ بِظَهْرِ الْغَيْبِ إِلاَّ قَالَ الْمَلَكُ: وَلَكَ بِمِثْلٍ»"
-            englishTranslation="Abu Darda reported: The Messenger of Allah said, 'No Muslim servant prays for his brother in his absence but that an angel says: And to you the same.'"
-            lessonTitle="Key Lesson & Reflection"
-            lessonBody="Supplicating for another without their knowledge is free of social show and insincerity."
-            secondarySource="Sunan Abi Dawud 1534"
-            secondaryText="The fastest supplication to be answered is the prayer of someone for his brother in his absence."
-            calloutText="Who in your contacts list is quietly undergoing a hardship? A 10-word text can lift an entire mountain today."
-          />
-        ) : null}
-        {tab === 'history' ? (
-          <HistoryTab
-            allTimeLabel="All-Time Duas Sent"
-            allTimeValue="19"
-            allTimeSub="+4 this week"
-            xpLabel="Total Barakah XP"
-            xpValue="285"
-            xpSub="Silver Habit Tier"
-            entries={[
-              { when: 'Yesterday', text: 'Sent to Sister Mariam for good health', countLabel: 'Completed 1x', xp: '+15 XP' },
-              { when: '3 Days Ago • Shawwal 4', text: 'Group message to university study circle', countLabel: 'Completed 3x', xp: '+45 XP' },
-              { when: 'Last Friday • Jumu\'ah', text: 'Dua before Maghrib hour to cousin Zayd', countLabel: 'Completed 1x', xp: '+15 XP' },
-            ]}
-            streakLabel="Consistency Streak: 5 Days"
-            streakBody="Keep sending daily blessings to unlock the Kind Soul golden road trophy badge!"
-          />
-        ) : null}
-      </ScrollView>
+          {/* Action area */}
+          {isDone ? (
+            <View className="gap-3">
+              <View
+                className="flex-row items-center justify-between rounded-2xl px-4 py-3"
+                style={{ backgroundColor: colors.surfaceLowest, borderWidth: 1, borderColor: colors.success }}
+              >
+                <View className="flex-row items-center gap-1.5">
+                  <Ionicons name="checkmark-circle" size={20} color={colors.success} />
+                  <Text className="font-label-md text-label-md" style={{ color: colors.success, fontWeight: '700' }}>
+                    {timesDone > 1 ? t('deed.doneTimes', { count: timesDone }) : t('deed.doneLabel')}
+                  </Text>
+                </View>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t('deed.undo')}
+                  testID="deed-undo"
+                  onPress={() => void mark(false)}
+                  hitSlop={8}
+                  className="px-3 py-2"
+                >
+                  <Text className="font-label-md text-label-md" style={{ color: colors.coral, fontWeight: '700' }}>
+                    {t('deed.undo')}
+                  </Text>
+                </Pressable>
+              </View>
+              <Button3D label={t('deed.redo')} variant="coral" testID="deed-redo" onPress={() => void mark(true)} />
+            </View>
+          ) : (
+            <Button3D label={t('deed.doneButton')} variant="coral" testID="deed-done" onPress={() => void mark(true)} />
+          )}
+
+          {/* History of this deed */}
+          <View className="gap-2 pt-2">
+            <View className="flex-row items-center gap-1.5 px-1">
+              <Ionicons name="time-outline" size={16} color={colors.textMuted} />
+              <Text className="font-label-md text-label-md" style={{ color: colors.textMuted, fontWeight: '800' }}>
+                {t('deed.historyTitle')}
+              </Text>
+              <Text className="font-label-md text-label-md" style={{ color: colors.textMuted }}>
+                {`(${history.length})`}
+              </Text>
+            </View>
+            {history.length === 0 ? (
+              <Text className="font-body text-body-sm px-1" style={{ color: colors.textMuted }}>
+                {t('deed.historyEmpty')}
+              </Text>
+            ) : (
+              history.map((entry) => (
+                <View
+                  key={entry.id}
+                  className="flex-row items-center gap-3 rounded-2xl px-4 py-3"
+                  style={{ backgroundColor: colors.surfaceLowest, borderWidth: 1, borderColor: colors.border }}
+                >
+                  <View
+                    className="items-center justify-center rounded-full"
+                    style={{ width: 32, height: 32, backgroundColor: colors.surface }}
+                  >
+                    <Ionicons name="checkmark" size={16} color={colors.success} />
+                  </View>
+                  <Text className="font-body text-body-md flex-1" style={{ color: colors.text }}>
+                    {dayLabel(entry.day)}
+                  </Text>
+                  <Text className="font-body text-body-sm" style={{ color: colors.textMuted }}>
+                    {timeOf(entry)}
+                  </Text>
+                </View>
+              ))
+            )}
+          </View>
+        </ScrollView>
+
+        <Toast visible={toastMsg !== null} message={toastMsg ?? ''} onHide={() => setToastMsg(null)} />
+      </SafeAreaView>
     </View>
   );
 }

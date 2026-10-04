@@ -5,6 +5,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useEffect } from 'react';
 import { initDb } from '@/db';
+import { seedDemoHistoryIfEmpty } from '@/dev/seedDemoHistory';
 import { ThemeProvider } from '@/theme/ThemeProvider';
 import { LocaleProvider } from '@/i18n/LocaleProvider';
 import { useAppFonts } from '@/theme/useFonts';
@@ -15,7 +16,9 @@ export default function RootLayout() {
   const fontsLoaded = useAppFonts();
 
   useEffect(() => {
-    initDb().catch(err => console.error('[db] init failed', err));
+    initDb()
+      .then(() => seedDemoHistoryIfEmpty())
+      .catch(err => console.error('[db] init failed', err));
   }, []);
 
   useEffect(() => {

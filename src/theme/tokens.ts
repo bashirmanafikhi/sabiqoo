@@ -22,6 +22,16 @@ export type ColorPalette = {
   textMuted: string;
   success: string;
   warning: string;
+  overlay: string;
+  onGold: string;
+  onNavy: string;
+  onNavyMuted: string;
+  onNavyTrack: string;
+  coralFill: string;
+  onCoral: string;
+  tangerineFill: string;
+  onTangerine: string;
+  tangerineFillDark: string;
 };
 
 export const lightColors = {
@@ -35,13 +45,23 @@ export const lightColors = {
   surface:       '#E6EEFF',
   surfaceHigh:   '#DCE9FF',
   surfaceHighest:'#D3E4FE',
-  border:        '#E1BFBC',
-  outline:       '#8D706E',
+  border:        '#D9E3F2',
+  outline:       '#65758B',
   text:          '#2D4059',
   textPrimary:   '#2D4059',
   textMuted:     '#5B6E85',
-  success:       '#EA5455',
+  success:       '#2F8F4E',
   warning:       '#F07B3F',
+  overlay:       '#1D2B3DB3',
+  onGold:        '#1D2B3D',
+  onNavy:        '#FFFFFF',
+  onNavyMuted:   '#E7EEF9E6',
+  onNavyTrack:   '#FFFFFF33',
+  coralFill:     '#C83E40',
+  onCoral:       '#FFFFFF',
+  tangerineFill: '#CF6027',
+  onTangerine:   '#FFFFFF',
+  tangerineFillDark: '#A84A18',
 } as const satisfies ColorPalette;
 
 export const darkColors = {
@@ -56,12 +76,22 @@ export const darkColors = {
   surfaceHigh:   '#243651',
   surfaceHighest:'#2A3E5E',
   border:        '#3A4A66',
-  outline:       '#5B6E85',
+  outline:       '#93A5BF',
   text:          '#EAF1FF',
   textPrimary:   '#EAF1FF',
   textMuted:     '#A6B6CC',
-  success:       '#FF8A8B',
+  success:       '#6FCB8B',
   warning:       '#FF9C66',
+  overlay:       '#000000AA',
+  onGold:        '#1D2B3D',
+  onNavy:        '#EAF1FF',
+  onNavyMuted:   '#E7EEF9E6',
+  onNavyTrack:   '#FFFFFF33',
+  coralFill:     '#FF8A8B',
+  onCoral:       '#0E1A2C',
+  tangerineFill: '#FF9C66',
+  onTangerine:   '#0E1A2C',
+  tangerineFillDark: '#B8521D',
 } as const satisfies ColorPalette;
 
 export type ThemeMode = 'light' | 'dark' | 'system';

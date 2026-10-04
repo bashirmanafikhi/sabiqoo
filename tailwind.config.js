@@ -1,4 +1,22 @@
 /** @type {import('tailwindcss').Config} */
+
+const SANS = [
+  'PlusJakartaSans_500Medium',
+  'PlusJakartaSans_600SemiBold',
+  'PlusJakartaSans_700Bold',
+  'PlusJakartaSans_800ExtraBold',
+];
+
+const HEADLINE = [
+  'Epilogue_500Medium',
+  'Epilogue_600SemiBold',
+  'Epilogue_700Bold',
+  'Epilogue_800ExtraBold',
+  'Epilogue_900Black',
+];
+
+const ARABIC = ['Cairo_700Bold', 'Cairo_800ExtraBold', 'Cairo_900Black'];
+
 module.exports = {
   content: [
     './app/**/*.{js,jsx,ts,tsx}',
@@ -27,15 +45,18 @@ module.exports = {
         'text-muted':    { light: '#5B6E85', dark: '#A6B6CC' },
         border:          { light: '#E1BFBC', dark: '#3A4A66' },
         outline:         { light: '#8D706E', dark: '#5B6E85' },
-        'stripe-mastered':  '#EA5455',
-        'stripe-completed': '#F07B3F',
-        'stripe-available': '#FFD460',
-        'stripe-locked':    '#E1BFBC',
       },
       fontFamily: {
-        sans:     ['PlusJakartaSans_500Medium', 'PlusJakartaSans_600SemiBold', 'PlusJakartaSans_700Bold', 'PlusJakartaSans_800ExtraBold'],
-        headline: ['Epilogue_500Medium', 'Epilogue_600SemiBold', 'Epilogue_700Bold', 'Epilogue_800ExtraBold', 'Epilogue_900Black'],
-        arabic:   ['Cairo_700Bold', 'Cairo_800ExtraBold', 'Cairo_900Black'],
+        sans: SANS,
+        body: SANS,
+        'body-sm': SANS,
+        'body-lg': SANS,
+        label: SANS,
+        'label-sm': SANS,
+        'label-md': SANS,
+        'label-lg': SANS,
+        headline: HEADLINE,
+        arabic: ARABIC,
       },
       borderRadius: {
         sm: 4, DEFAULT: 8, md: 12,

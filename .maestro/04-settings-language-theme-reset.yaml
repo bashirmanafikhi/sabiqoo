@@ -1,0 +1,32 @@
+# Flow 04 — Settings: language, theme, erase history, back to a clean Discover.
+name: "04 Settings language theme reset"
+appId: com.bashirmanafikhi.sabiqoo
+---
+- launchApp:
+      clearState: true
+- assertVisible: "Sabiqoo"
+- tapOn: "Settings"
+- assertVisible: "Language"
+- assertVisible: "Theme"
+- tapOn:
+      id: "seg-ar"
+- assertVisible: "الإعدادات"
+- takeScreenshot: settings-arabic
+- tapOn:
+      id: "seg-en"
+- assertVisible: "Language"
+- tapOn:
+      id: "seg-dark"
+- tapOn:
+      id: "seg-light"
+- tapOn:
+      id: "reset-data"
+- assertVisible: "Erase the entire history?"
+- tapOn: "Cancel"
+- tapOn:
+      id: "reset-data"
+- assertVisible: "Erase the entire history?"
+- tapOn: "Erase history"
+- tapOn: "Discover"
+- assertVisible: "Give charity, even a little"
+- takeScreenshot: after-reset

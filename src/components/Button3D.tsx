@@ -26,13 +26,6 @@ export interface Button3DProps {
 const HEIGHT = 52;
 const BEVEL = 4;
 
-const PALETTE = {
-  coral:     { top: '#EA5455', bottom: '#C83E40' },
-  tangerine: { top: '#F07B3F', bottom: '#CF6027' },
-  navy:      { top: '#2D4059', bottom: '#1D2B3D' },
-  gold:      { top: '#FFD460', bottom: '#D4A838' },
-} as const;
-
 export function Button3D({
   label, onPress, variant = 'coral', loading, disabled,
   size = 'md', accessibilityLabel, testID, leadingIcon, trailingIcon,
@@ -42,17 +35,25 @@ export function Button3D({
   const top = useAnimatedStyle(() => ({ transform: [{ translateY: pressed.value }] }));
 
   const onPressIn = useCallback(() => {
+    // eslint-disable-next-line react-hooks/immutability -- Reanimated shared values are mutable by design
     pressed.value = withTiming(BEVEL, { duration: 80 });
     haptics.selection();
   }, [pressed]);
   const onPressOut = useCallback(() => {
+    // eslint-disable-next-line react-hooks/immutability -- Reanimated shared values are mutable by design
     pressed.value = withTiming(0, { duration: 120 });
   }, [pressed]);
 
-  const pal = variant !== 'ghost' ? PALETTE[variant] : null;
+  const palettes = {
+    coral:     { top: colors.coralFill, bottom: colors.coralDark, text: colors.onCoral },
+    tangerine: { top: colors.tangerineFill, bottom: colors.tangerineFillDark, text: colors.onTangerine },
+    navy:      { top: colors.navyDark, bottom: colors.border, text: colors.gold },
+    gold:      { top: colors.gold, bottom: colors.goldDark, text: colors.onGold },
+  } as const;
+  const pal = variant !== 'ghost' ? palettes[variant] : null;
   const topBg = pal?.top ?? colors.surfaceLowest;
-  const bottomBg = pal?.bottom ?? colors.surface;
-  const textColor = variant === 'gold' ? colors.navy : (variant === 'ghost' ? colors.text : '#FFFFFF');
+  const bottomBg = pal?.bottom ?? colors.border;
+  const textColor = pal?.text ?? colors.text;
   const w = size === 'square' ? 56 : undefined;
 
   return (

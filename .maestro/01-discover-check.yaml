@@ -1,0 +1,16 @@
+# Flow 01 — Discover: check a deed from the card, undo, re-check.
+name: "01 Discover check undo recheck"
+appId: com.bashirmanafikhi.sabiqoo
+---
+- launchApp:
+      clearState: true
+- assertVisible: "Give charity, even a little"
+- tapOn:
+      id: "deed-check-ch-sadaqah-little"
+- assertVisible: "Mashallah! ✨"
+- tapOn:
+      id: "deed-check-ch-sadaqah-little"
+- assertVisible: "Removed from today's log"
+- tapOn:
+      id: "deed-check-ch-sadaqah-little"
+- takeScreenshot: discover-checked

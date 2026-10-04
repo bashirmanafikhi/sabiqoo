@@ -20,11 +20,11 @@ export function SegmentedControl<T extends string>({ value, onChange, options }:
             accessibilityState={{ selected: active }}
             onPress={() => onChange(opt.value)}
             testID={`seg-${opt.value}`}
-            className="flex-1 py-2 px-3 rounded-xl items-center justify-center flex-row gap-1.5"
-            style={{ backgroundColor: active ? '#EA5455' : 'transparent', shadowOpacity: active ? 0.1 : 0 }}>
+            className="flex-1 py-2.5 px-3 rounded-xl items-center justify-center flex-row gap-1.5"
+            style={{ backgroundColor: active ? colors.coralFill : 'transparent' }}>
             {opt.leadingIcon}
-            <Text className="font-label-md text-label-md uppercase"
-              style={{ color: active ? '#FFFFFF' : colors.text, fontWeight: '800' }}>
+            <Text className="font-label-md text-label-md"
+              style={{ color: active ? colors.onCoral : colors.text, fontWeight: '800' }}>
               {opt.label}
             </Text>
           </Pressable>

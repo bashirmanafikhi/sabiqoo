@@ -36,7 +36,8 @@ describe('i18n', () => {
     await initI18n();
     expect(currentLocale()).toBe('ar');
     expect(i18nDefault.t('app.name')).toBe('سابقوا');
-    expect(i18nDefault.t('home.title')).toBe('خارطة الطريق');
+    expect(i18nDefault.t('tabs.discover')).toBe('اكتشاف');
+    expect(i18nDefault.t('tabs.history')).toBe('السجل');
     expect(isRTL()).toBe(true);
   });
 
@@ -48,21 +49,20 @@ describe('i18n', () => {
 
     expect(currentLocale()).toBe('en');
     expect(i18nDefault.t('app.name')).toBe('Sabiqoo');
-    expect(i18nDefault.t('home.title')).toBe('Roadmap');
+    expect(i18nDefault.t('tabs.discover')).toBe('Discover');
+    expect(i18nDefault.t('tabs.history')).toBe('History');
     expect(isRTL()).toBe(false);
   });
 
-  test('interpolation works for both locales', async () => {
+  test('interpolation and plurals work for both locales', async () => {
     await initI18n();
-    expect(i18nDefault.t('home.streak', { days: 5 })).toBe('سلسلة 5 يومًا');
-    expect(i18nDefault.t('deed.markCompleted', { xp: 10 })).toBe(
-      'تم إنجاز التحدي (+10 XP)',
-    );
+    expect(i18nDefault.t('discover.donePillAria', { count: 3, deeds: i18nDefault.t('plurals.deeds', { count: 3 }) }))
+      .toBe('أنجزت 3 أعمال حتى الآن');
+    expect(i18nDefault.t('plurals.deeds', { count: 1 })).toBe('عمل');
 
     await setLocale('en');
-    expect(i18nDefault.t('home.streak', { days: 5 })).toBe('5-day streak');
-    expect(i18nDefault.t('deed.markCompleted', { xp: 10 })).toBe(
-      'Mark as Completed (+10 XP)',
-    );
+    expect(i18nDefault.t('discover.donePillAria', { count: 1, deeds: i18nDefault.t('plurals.deeds', { count: 1 }) }))
+      .toBe('You have completed 1 deed so far');
+    expect(i18nDefault.t('plurals.deeds', { count: 5 })).toBe('deeds');
   });
 });

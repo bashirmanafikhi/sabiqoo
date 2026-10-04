@@ -381,6 +381,42 @@
 
 ---
 
+## Phase 4 — Engagement & Retention (post-v1, in flight)
+
+### P4-T01 — Custom deed creation (F-01) ✅ DONE
+**DONE when** users can author a deed (title AR + EN, description AR + EN, category, XP 5–100, difficulty 1–3) from a FAB on the catalog screen, see it in the catalog with a "Yours" badge, and the schema migrates existing DBs without a wipe.
+
+- [x] Add `source TEXT NOT NULL DEFAULT 'seed'` to `deeds` table in Drizzle schema + `MIGRATION_SQL`
+- [x] Idempotent `ALTER TABLE deeds ADD COLUMN source` for existing DBs via `applyIdempotentMigrations` (PRAGMA table_info gate)
+- [x] Export new `DeedSource = 'seed' | 'user'` type
+- [x] `seed-runtime.ts` writes `source='seed'` on every seed insert
+- [x] `deedsRepo.insertCustomDeed({...})` — generates unique `user-{ts}-{rand}` slug, sets `source='user'`, validates required fields, XP 5–100, difficulty ∈ {1,2,3}
+- [x] `deedsRepo.listBySource('seed' | 'user')` for filtering
+- [x] `app/deed/create.tsx` form — bilingual title/description, category chips, ±5 XP stepper (5–100), 1/2/3 difficulty picker, KeyboardAvoidingView
+- [x] FAB on `app/(tabs)/catalog.tsx` → `/deed/create` with `accessibilityLabel={t('customDeed.addCta')}`
+- [x] `CatalogDeedCard` accepts optional `source` prop; renders "Yours" pill with `person` icon when `source === 'user'`
+- [x] i18n: new `customDeed` namespace in `ar.json` + `en.json` (160 keys each, parity enforced by `scripts/check-i18n.ts`)
+- [x] `rtl-text.d.ts` extended so `TextInputProps` accepts `dir`
+- [x] Repo tests in `__tests__/repos.test.ts` cover: insert+fetch round-trip, listBySource filter, empty-title rejection, XP/difficulty range validation, unique-slug generation — *suite skips on this env due to the documented `better-sqlite3` Windows/Node 26 issue; runs on Linux/macOS/CI*
+
+### P4-T02 — Achievements / badges (F-02) ✅ DONE
+**DONE when** users unlock milestones (first-deed +10, streak-7 +50, deeds-50 +100, all-categories +200 XP), see an Alert on first unlock per session, find a count badge in the top bar, and a full list with locked/unlocked state in Settings.
+
+- [x] Add `achievements` + `user_achievements` tables to Drizzle schema + `MIGRATION_SQL`
+- [x] Idempotent CREATE for both tables via `applyIdempotentMigrations` (sqlite_master gate) so existing DBs upgrade in place
+- [x] Seed catalog: 4 achievements in `seed-data.ts` (`first-deed`, `streak-7`, `deeds-50`, `all-categories`), seeded via `seedAchievementsAlways` on every boot
+- [x] Pure `evaluateAchievements(state)` in `src/gamification/achievements.ts` — returns newly-unlocked slugs, filters `alreadyUnlockedSlugs`
+- [x] 7 unit tests in `__tests__/gamification.test.ts`: empty, first-deed, streak-7, deeds-50, all-categories (partial + full), no re-unlock, simultaneous thresholds — *all pass*
+- [x] `achievementsRepo` (`listAll`, `listUnlockedIds`, `isUnlocked`, `unlock` with `ON CONFLICT DO NOTHING`)
+- [x] `useAchievements()` hook in `src/gamification/useAchievements.ts` — loads catalog on mount, exposes `evaluateAfterLog` which calls `evaluateAndUnlock`, applies XP bonus, fires `Alert` for the first new unlock
+- [x] `AppTopBar` accepts optional `achievementsCount` / `achievementsTotal` / `onAchievementsPress` props → renders a tappable `trophy` pill in the top bar
+- [x] Catalog screen wires the achievements pill → navigates to `/settings`
+- [x] Settings screen renders achievements section with each row's icon, bilingual title/description, XP bonus, and locked (greyed, lock-closed) vs unlocked (gold, checkmark-circle) state
+- [x] i18n: new `achievements` namespace, 169 keys each, parity enforced by `scripts/check-i18n.ts`
+- [x] Out of scope (kept simple): no celebratory overlay / Lottie, no per-deed evaluation (caller wires `evaluateAfterLog` after each log), no retroactive unlock UI in Roadmap graph — minimal Alert + Settings list only
+
+---
+
 ## Phase summary
 
 | Phase | Tickets | Done | Partial | Pending |
@@ -388,7 +424,8 @@
 | 1 — Foundation | 15 | 9 | 4 | 2 |
 | 2 — Core screens | 17 | 6 | 9 | 2 |
 | 3 — Polish & Launch | 10 | 2 | 4 | 4 |
-| **Total** | **42** | **17** | **17** | **8** |
+| 4 — Engagement & Retention | 2 | 2 | 0 | 0 |
+| **Total** | **44** | **19** | **17** | **8** |
 
 ---
 

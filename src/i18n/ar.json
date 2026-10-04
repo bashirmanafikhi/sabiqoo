@@ -1,164 +1,76 @@
 {
   "app": {
-    "name": "سابقوا"
+    "name": "سابقوا",
+    "tagline": "أفكار أعمال خير بين يديك"
+  },
+  "tabs": {
+    "discover": "اكتشاف",
+    "history": "السجل",
+    "settings": "الإعدادات"
   },
   "common": {
-    "save": "حفظ",
-    "cancel": "إلغاء",
-    "delete": "حذف",
-    "close": "إغلاق",
-    "loading": "جاري التحميل...",
-    "retry": "إعادة المحاولة",
-    "search": "بحث"
+    "back": "رجوع"
   },
-  "home": {
-    "title": "خارطة الطريق",
-    "streak": "سلسلة {{days}} يومًا",
-    "streak_unit": "يوم",
-    "xpLevel": "المستوى {{level}}",
-    "bookmarks": "قائمتي",
-    "language": "اللغة",
-    "settings": "الإعدادات",
-    "deedCompleted": "تم تسجيل العمل. ما شاء الله!"
-  },
-  "roadmap": {
-    "unitProgress": "التقدم: {{done}} من {{total}} خطوة",
-    "chestTitle": "هديّة البركة اليوميّة!",
-    "chestBody": "حافظت على سلسلتك. إليك هديّتك التحفيزيّة اليوميّة:",
-    "todaysRecommended": "عمل اليوم المُقترح",
-    "rewardLabel": "+{{xp}} نقطة • جوهرة بركة واحدة",
-    "completeLabel": "وضع علامة تم",
-    "levelCardTitle": "سبيل البركة",
-    "dailyGoalRemaining": "الهدف اليومي: {{count}} أعمال متبقّية",
-    "branchA": "الخيار أ: روحي",
-    "branchB": "الخيار ب: مالي",
-    "restoreChest": "الحمد لله!"
-  },
-  "catalog": {
-    "title": "الكتالوج",
-    "searchPlaceholder": "ابحث عن عمل خيري...",
-    "searchHint": "يبحث في عناوين الأعمال ووصفها.",
-    "empty": "لا توجد أعمال تطابق بحثك.",
-    "progress": "{{done}} من {{total}}",
-    "locked": "مغلق",
-    "counter": "عرض {{shown}} من {{total}} عمل",
-    "filtersLabel": "الفلاتر",
-    "activeRealm": "المجال النشط",
-    "masteryLevel": "مستوى الإتقان {{level}}",
-    "emptyTitle": "لا توجد أعمال لبحثك",
-    "emptyBody": "حاول تعديل الكلمات المفتاحيّة أو استكشاف مجالات أخرى أو مسح الفلاتر النشطة.",
-    "clearFilters": "مسح كل الفلاتر",
-    "allDeedsLabel": "كل الأعمال",
-    "allDeedsCount": "{{count}}"
+  "discover": {
+    "all": "الكل",
+    "categoryDone": "أنجزت {{done}} من {{count}}",
+    "donePillAria": "أنجزت {{count}} {{deeds}} حتى الآن",
+    "random": "اقترح لي عملًا",
+    "doneAria": "منجزة",
+    "notDoneAria": "اضغط للإشارة إلى أنك أديتها"
   },
   "deed": {
-    "tabs": {
-      "today": "اليوم",
-      "evidence": "الدليل",
-      "history": "السجل"
-    },
-    "markCompleted": "تم إنجاز التحدي (+{{xp}} XP)",
-    "quantity": "الكمية",
-    "notePlaceholder": "أضف ملاحظة (اختياري)",
-    "noteHint": "ملاحظة اختيارية تظهر في سجلك.",
-    "category": "الصنف",
-    "reference": {
-      "quran": "قرآن كريم",
-      "hadith": "حديث شريف",
-      "athkar": "أذكار",
-      "lesson": "الدرس:",
-      "empty": "لم يُضف دليل شرعي لهذا العمل بعد."
-    },
-    "history": {
-      "empty": "لم تُكمل أي عمل بعد.",
-      "today": "اليوم",
-      "yesterday": "أمس",
-      "daysAgo": "منذ {{n}} يوم"
-    }
+    "doneButton": "فعلتها!",
+    "doneLabel": "أديتها",
+    "doneTimes": "أديتها {{count}} مرات",
+    "redo": "أعدها مرة أخرى",
+    "undo": "تراجع",
+    "close": "إغلاق",
+    "historyTitle": "سجلك لهذا العمل",
+    "historyEmpty": "أول مرة هنا — سيُضاف إلى سجلك بمجرد أن تفعله"
   },
-  "deedDetail": {
-    "tabs": { "today": "اليوم", "evidence": "الدليل", "history": "السجل" },
-    "todayCategory": "ابتسامات وكلمات طيّبة يوميّة",
-    "todaySubtitle": "خذ 30 ثانية لإرسال دعاء أو رسالة تشجيعيّة صادقة.",
-    "badgeEasy": "سهل • أقل من دقيقة",
-    "badgeRepeatable": "قابل للتكرار يوميًا",
-    "badgeSunnah": "سنة نبويّة",
-    "stepperLabel": "مرّات الأداء اليوم",
-    "stepperSub": "ضاعف أجرك",
-    "notesLabel": "تأمّل شخصي (اختياري)",
-    "notesPrivate": "خاصّ بك",
-    "notesPlaceholder": "أضف ملاحظة شخصيّة (اختياري)...",
-    "completeCta": "وضع علامة تم (+{{xp}} نقطة)",
-    "celebrationBanner": "بارك الله فيك! تم تسجيل العمل لليوم.",
-    "propheticWisdom": "حكمة نبويّة",
-    "propheticPreview": "«ما من عبد مسلم يدعو لأخيه بظهر الغيب إلا قال الملك: ولك بمثل»",
-    "evidenceAuthentic": "صحيح • أصيل",
-    "evidenceTranslation": "الترجمة",
-    "evidenceLesson": "الدرس والعِبرة",
-    "evidenceCallout": "مَن في قائمة جهات الاتصال لديك يمرّ بضائقة صامتة؟ رسالة من عشر كلمات قد ترفع جبلًا اليوم.",
-    "historyAllTime": "إجمالي الأدعية المُرسلة",
-    "historyXpTotal": "مجموع نقاط البركة",
-    "historyRecentTitle": "أحدث الإنجازات",
-    "historyRecentSub": "آخر 30 يومًا"
-  },
-  "bookmarks": {
-    "title": "قائمتي",
-    "empty": "لم تحفظ أي عمل بعد. تصفّح الكتالوج وأضف ما يلهمك.",
-    "emptyCta": "تصفّح الكتالوج",
-    "added": "أضيف إلى قائمتي",
-    "removed": "أزيل من قائمتي",
-    "count": "{{count}} محفوظ"
+  "toast": {
+    "celebrate": "ما شاء الله! ✨",
+    "undone": "أُزيل من سجلك"
   },
   "history": {
     "title": "السجل",
-    "last30Days": "آخر 30 يومًا",
-    "byCategory": "حسب الصنف",
-    "pageTag": "يوميات المسير",
-    "pageTitle": "الأثر الروحي",
-    "streakTitle": "سلسلة {{days}} يوم",
-    "activeTag": "نشِط",
-    "recordText": "الرقم القياسي: {{record}} يوم • أفضل إنجاز شخصي",
-    "freezesLabel": "{{count}} تجميدات",
-    "statTotal": "المجموع",
-    "statTotalLabel": "الأعمال المسجّلة",
-    "statXp": "النقاط",
-    "statXpLabel": "بركة {{level}}",
-    "statScore": "الدرجة",
-    "statScoreLabel": "الهدف الأسبوعي",
-    "consistencyHeatmap": "خريطة الالتزام",
-    "consistencySub": "نبض النشاط في آخر 30 يومًا",
-    "deedsPerDay": "{{count}} عمل/يوم",
-    "categoryDistribution": "توزيع الأصناف",
-    "categorySub": "حيث تتشعّب بركتك",
-    "recentDeeds": "أحدث الأعمال",
-    "thisWeek": "هذا الأسبوع",
-    "nextMilestone": "الإنجاز التالي",
-    "fewerDeeds": "أعمال أقل",
-    "fiveDeeds": "5 أعمال"
+    "totalAria": "{{count}} {{deeds}} في سجلك",
+    "today": "اليوم",
+    "yesterday": "أمس",
+    "emptyTitle": "سجلك فارغ بعد",
+    "emptyBody": "أول عمل تنجزه سيظهر هنا",
+    "browse": "تصفّح الأعمال",
+    "remove": "إزالة من السجل",
+    "removeConfirmTitle": "إزالة هذا الإنجاز؟",
+    "removeConfirmBody": "سيُحذف من سجلك فقط، ويمكنك إنجازه مجددًا وقتما شئت."
   },
   "settings": {
     "title": "الإعدادات",
-    "theme": "المظهر",
-    "theme.system": "النظام",
-    "theme.light": "فاتح",
-    "theme.dark": "داكن",
     "language": "اللغة",
-    "streakFreeze": "تجميد السلسلة",
-    "streakFreezeDesc": "استخدم التجميد للحفاظ على سلسلتك عند تفويت يوم.",
-    "about": "حول التطبيق",
-    "version": "الإصدار {{v}}"
+    "theme": "المظهر",
+    "themeSystem": "تلقائي",
+    "themeLight": "فاتح",
+    "themeDark": "داكن",
+    "reset": "حذف كل السجل",
+    "rate": "قيّم التطبيق",
+    "share": "شارك التطبيق",
+    "feedback": "أرسل ملاحظاتك",
+    "resetConfirmTitle": "حذف السجل بالكامل؟",
+    "resetConfirmBody": "ستُحذف كل إنجازاتك المسجّلة. لا يمكن التراجع.",
+    "about": "سابقوا — يلهمك الأعمال الصالحة",
+    "privacy": "بياناتك محفوظة على جهازك فقط، ولا يلزم إنترنت."
   },
-  "reward": {
-    "streak": "🔥 {{n}}",
-    "xp": "+{{xp}} XP",
-    "levelUp": "ارتقاء المستوى!",
-    "celebrate": "أحسنت!"
+  "plurals": {
+    "deeds_zero": "أعمال",
+    "deeds_one": "عمل",
+    "deeds_two": "عملان",
+    "deeds_few": "أعمال",
+    "deeds_many": "عملًا",
+    "deeds_other": "عمل"
   },
-  "skip": {
-    "toggle": "غير مناسب لي",
-    "undoToggle": "إلغاء التخطي",
-    "sectionTitle": "الأعمال التي تخطيتها",
-    "sectionEmpty": "لم تتخطَّ أي عمل بعد.",
-    "lockedHint": "هذا العمل لا يناسبك، يمكنك العودة إليه متى ما استطعت."
+  "notFound": {
+    "title": "الصفحة غير موجودة",
+    "back": "رجوع"
   }
 }

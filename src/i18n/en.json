@@ -1,164 +1,76 @@
 {
   "app": {
-    "name": "Sabiqoo"
+    "name": "Sabiqoo",
+    "tagline": "Good-deed ideas, right in your pocket"
+  },
+  "tabs": {
+    "discover": "Discover",
+    "history": "History",
+    "settings": "Settings"
   },
   "common": {
-    "save": "Save",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "close": "Close",
-    "loading": "Loading…",
-    "retry": "Retry",
-    "search": "Search"
+    "back": "Back"
   },
-  "home": {
-    "title": "Roadmap",
-    "streak": "{{days}}-day streak",
-    "streak_unit": "days",
-    "xpLevel": "Lvl {{level}}",
-    "bookmarks": "My List",
-    "language": "Language",
-    "settings": "Settings",
-    "deedCompleted": "Deed logged. MashaAllah!"
-  },
-  "roadmap": {
-    "unitProgress": "Progress: {{done}} of {{total}} Steps",
-    "chestTitle": "Daily Barakah Gift!",
-    "chestBody": "You maintained a streak. Here is your daily motivational gift:",
-    "todaysRecommended": "Today's Recommended Deed",
-    "rewardLabel": "+{{xp}} XP • 1 Barakah Gem",
-    "completeLabel": "Mark as Done",
-    "levelCardTitle": "Path of Barakah",
-    "dailyGoalRemaining": "Daily Goal: {{count}} deeds remaining",
-    "branchA": "Choice A: Spiritual",
-    "branchB": "Choice B: Financial",
-    "restoreChest": "Alhamdulillah!"
-  },
-  "catalog": {
-    "title": "Catalog",
-    "searchPlaceholder": "Search deeds…",
-    "searchHint": "Searches deed titles and descriptions.",
-    "empty": "No deeds match your search.",
-    "progress": "{{done}} of {{total}}",
-    "locked": "Locked",
-    "counter": "Showing {{shown}} of {{total}} deeds",
-    "filtersLabel": "Filters",
-    "activeRealm": "Active Realm",
-    "masteryLevel": "Category Mastery Level {{level}}",
-    "emptyTitle": "No deeds found for your search",
-    "emptyBody": "Try adjusting keywords, exploring other realms, or clearing active filters.",
-    "clearFilters": "Clear All Filters",
-    "allDeedsLabel": "All Deeds",
-    "allDeedsCount": "{{count}}"
+  "discover": {
+    "all": "All",
+    "categoryDone": "{{done}} of {{count}} done",
+    "donePillAria": "You have completed {{count}} {{deeds}} so far",
+    "random": "Surprise me",
+    "doneAria": "Done",
+    "notDoneAria": "Tap to mark as done"
   },
   "deed": {
-    "tabs": {
-      "today": "Today",
-      "evidence": "Evidence",
-      "history": "History"
-    },
-    "markCompleted": "Mark as Completed (+{{xp}} XP)",
-    "quantity": "Quantity",
-    "notePlaceholder": "Add a note (optional)",
-    "noteHint": "Optional note shown in your history.",
-    "category": "Category",
-    "reference": {
-      "quran": "Qur'an",
-      "hadith": "Hadith",
-      "athkar": "Athkar",
-      "lesson": "Lesson:",
-      "empty": "No religious evidence has been added for this deed yet."
-    },
-    "history": {
-      "empty": "No completed deeds yet.",
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "daysAgo": "{{n}} days ago"
-    }
+    "doneButton": "I did it!",
+    "doneLabel": "Done",
+    "doneTimes": "Done {{count}}×",
+    "redo": "Do it again",
+    "undo": "Undo",
+    "close": "Close",
+    "historyTitle": "Your history for this deed",
+    "historyEmpty": "First time here — it will be added to your history once you do it"
   },
-  "deedDetail": {
-    "tabs": { "today": "Today", "evidence": "Evidence", "history": "History" },
-    "todayCategory": "Everyday Smiles & Kind Words",
-    "todaySubtitle": "Take 30 seconds to send a heartfelt prayer or encouraging message.",
-    "badgeEasy": "Easy • < 1 min",
-    "badgeRepeatable": "Repeatable Daily",
-    "badgeSunnah": "Sunnah Habit",
-    "stepperLabel": "Times performed today",
-    "stepperSub": "Multiply your reward",
-    "notesLabel": "Personal Reflection (Optional)",
-    "notesPrivate": "Private to you",
-    "notesPlaceholder": "Add a personal note (optional)...",
-    "completeCta": "Mark as Completed (+{{xp}} XP)",
-    "celebrationBanner": "Barakallahu Feek! Deed logged for today.",
-    "propheticWisdom": "Prophetic Wisdom",
-    "propheticPreview": "\"No Muslim servant prays for his brother behind his back, but that the angel says: 'And to you the same.'\"",
-    "evidenceAuthentic": "صحيح • Authentic",
-    "evidenceTranslation": "Translation",
-    "evidenceLesson": "Key Lesson & Reflection",
-    "evidenceCallout": "Who in your contacts list is quietly undergoing a hardship? A 10-word text can lift an entire mountain today.",
-    "historyAllTime": "All-Time Duas Sent",
-    "historyXpTotal": "Total Barakah XP",
-    "historyRecentTitle": "Recent Completions",
-    "historyRecentSub": "Last 30 Days"
-  },
-  "bookmarks": {
-    "title": "My List",
-    "empty": "You haven't saved any deeds yet. Browse the catalog and add what inspires you.",
-    "emptyCta": "Browse the catalog",
-    "added": "Added to your list",
-    "removed": "Removed from your list",
-    "count": "{{count}} saved"
+  "toast": {
+    "celebrate": "Mashallah! ✨",
+    "undone": "Removed from your log"
   },
   "history": {
     "title": "History",
-    "last30Days": "Last 30 days",
-    "byCategory": "By category",
-    "pageTag": "Journey Log",
-    "pageTitle": "Spiritual Footprint",
-    "streakTitle": "{{days}} Day Streak",
-    "activeTag": "Active",
-    "recordText": "Record: {{record}} days • Personal Best",
-    "freezesLabel": "{{count}} Freezes",
-    "statTotal": "Total",
-    "statTotalLabel": "Deeds Logged",
-    "statXp": "XP",
-    "statXpLabel": "Barakah {{level}}",
-    "statScore": "Score",
-    "statScoreLabel": "Weekly Goal",
-    "consistencyHeatmap": "Consistency Heatmap",
-    "consistencySub": "Last 30 Days Activity Pulse",
-    "deedsPerDay": "{{count}} Deeds/day",
-    "categoryDistribution": "Category Distribution",
-    "categorySub": "Where your barakah radiates",
-    "recentDeeds": "Recent Deeds",
-    "thisWeek": "This Week",
-    "nextMilestone": "Next Milestone",
-    "fewerDeeds": "Fewer deeds",
-    "fiveDeeds": "5 deeds"
+    "totalAria": "{{count}} {{deeds}} in your history",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "emptyTitle": "Nothing here yet",
+    "emptyBody": "Your first completed deed will appear here",
+    "browse": "Browse deeds",
+    "remove": "Remove from history",
+    "removeConfirmTitle": "Remove this entry?",
+    "removeConfirmBody": "It will only be removed from your history — you can do it again anytime."
   },
   "settings": {
     "title": "Settings",
-    "theme": "Theme",
-    "theme.system": "System",
-    "theme.light": "Light",
-    "theme.dark": "Dark",
     "language": "Language",
-    "streakFreeze": "Streak freeze",
-    "streakFreezeDesc": "Use a freeze to keep your streak alive when you miss a day.",
-    "about": "About",
-    "version": "Version {{v}}"
+    "theme": "Theme",
+    "themeSystem": "System",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "reset": "Erase history",
+    "rate": "Rate the app",
+    "share": "Share the app",
+    "feedback": "Send feedback",
+    "resetConfirmTitle": "Erase the entire history?",
+    "resetConfirmBody": "All of your logged completions will be deleted. This cannot be undone.",
+    "about": "Sabiqoo — inspiring you to do good deeds",
+    "privacy": "Your data stays on this device. No internet needed."
   },
-  "reward": {
-    "streak": "🔥 {{n}}",
-    "xp": "+{{xp}} XP",
-    "levelUp": "Level up!",
-    "celebrate": "Well done!"
+  "plurals": {
+    "deeds_zero": "deeds",
+    "deeds_one": "deed",
+    "deeds_two": "deeds",
+    "deeds_few": "deeds",
+    "deeds_many": "deeds",
+    "deeds_other": "deeds"
   },
-  "skip": {
-    "toggle": "Not for me",
-    "undoToggle": "Un-skip",
-    "sectionTitle": "Skipped deeds",
-    "sectionEmpty": "You haven't skipped any deeds yet.",
-    "lockedHint": "This deed isn't right for you. You can come back to it anytime."
+  "notFound": {
+    "title": "Page not found",
+    "back": "Back"
   }
 }

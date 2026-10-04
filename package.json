@@ -12,9 +12,6 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
-    "seed": "tsx scripts/seed.ts",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx scripts/migrate.ts",
     "check:i18n": "tsx scripts/check-i18n.ts",
     "postinstall": "node scripts/patch-expo-sqlite.cjs"
   },
@@ -24,8 +21,6 @@
     "@expo-google-fonts/plus-jakarta-sans": "0.4.2",
     "@expo/vector-icons": "^15.1.1",
     "@react-native-async-storage/async-storage": "^2.2.0",
-    "@tanstack/react-query": "^5.59.0",
-    "ajv": "^8.20.0",
     "drizzle-orm": "^0.36.0",
     "expo": "^57.0.25",
     "expo-constants": "~57.0.19",
@@ -41,7 +36,6 @@
     "expo-system-ui": "~57.0.4",
     "i18next": "^23.16.4",
     "intl-pluralrules": "^2.0.1",
-    "lottie-react-native": "~7.3.8",
     "nativewind": "^2.0.11",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
@@ -51,12 +45,9 @@
     "react-native-reanimated": "^4.5.1",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "~4.26.0",
-    "react-native-svg": "^15.15.4",
     "react-native-web": "^0.21.3",
     "react-native-worklets": "^0.10.1",
-    "tailwindcss": "~3.2.7",
-    "zod": "^3.23.8",
-    "zustand": "^4.5.5"
+    "tailwindcss": "~3.2.7"
   },
   "devDependencies": {
     "@babel/core": "^7.25.0",
@@ -71,7 +62,6 @@
     "@typescript-eslint/parser": "^7.18.0",
     "autoprefixer": "^10.4.20",
     "better-sqlite3": "^11.3.0",
-    "drizzle-kit": "^0.28.0",
     "eslint": "^8.57.1",
     "eslint-config-expo": "~57.0.2",
     "eslint-plugin-react": "^7.36.1",

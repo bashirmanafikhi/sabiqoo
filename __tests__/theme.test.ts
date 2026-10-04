@@ -37,10 +37,10 @@ const wrap = (children: React.ReactNode): React.ReactElement =>
 
 describe('theme tokens', () => {
   test('lightColors.bg and darkColors.bg are distinct locked hexes', () => {
-    expect(lightColors.bg).toBe('#FFFFFF');
-    expect(darkColors.bg).toBe('#0B1220');
-    expect(lightColors.brand).toBe('#58CC02');
-    expect(darkColors.brand).toBe('#58CC02');
+    expect(lightColors.coral).toBe('#EA5455');
+    expect(darkColors.coral).toBe('#FF8A8B');
+    expect(lightColors.navy).toBe('#2D4059');
+    expect(darkColors.navy).toBe('#EAF1FF');
   });
 });
 

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useColors } from '@/theme/tokens';
 
 export interface ToastProps {
   visible: boolean;
@@ -10,6 +11,7 @@ export interface ToastProps {
 }
 
 export function Toast({ visible, message, onHide, durationMs = 3000 }: ToastProps) {
+  const colors = useColors();
   useEffect(() => {
     if (!visible) return;
     const id = setTimeout(onHide, durationMs);
@@ -22,9 +24,9 @@ export function Toast({ visible, message, onHide, durationMs = 3000 }: ToastProp
       opacity: visible ? 1 : 0, transform: [{ translateY: visible ? 0 : 16 }],
     }}>
       <View className="flex-row items-center gap-2 max-w-xs px-4 py-2.5 rounded-full"
-        style={{ backgroundColor: '#1D2B3D', borderWidth: 1, borderColor: '#FFFFFF1A' }}>
-        <Ionicons name="information-circle" size={18} color="#FFD460" />
-        <Text className="font-label-md text-label-md text-white" style={{ fontWeight: '700' }}>{message}</Text>
+        style={{ backgroundColor: colors.navyDark, borderWidth: 1, borderColor: colors.border }}>
+        <Ionicons name="checkmark-circle" size={18} color={colors.gold} />
+        <Text className="font-label-md text-label-md" style={{ color: colors.onNavy, fontWeight: '700' }}>{message}</Text>
       </View>
     </View>
   );

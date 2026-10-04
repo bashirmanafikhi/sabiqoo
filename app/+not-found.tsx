@@ -1,5 +1,4 @@
 import { Pressable, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useColors } from '@/theme/tokens';
@@ -20,35 +19,18 @@ export default function NotFoundScreen() {
       }}
     >
       <Stack.Screen options={{ headerShown: false }} />
-      <Ionicons name="alert-circle-outline" size={72} color={colors.textMuted} />
-      <Text
-        className="mt-4 text-2xl font-bold"
-        style={{ color: colors.textPrimary }}
-      >
-        404
-      </Text>
-      <Text
-        className="mt-2 text-base"
-        style={{ color: colors.textMuted, textAlign: 'center' }}
-      >
-        {t('home.title')}
+      <Text className="font-headline text-headline-lg" style={{ color: colors.text }}>
+        {t('notFound.title')}
       </Text>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={t('common.cancel')}
-        onPress={() => router.back()}
-        style={{
-          marginTop: 24,
-          paddingHorizontal: 24,
-          paddingVertical: 12,
-          borderRadius: 12,
-          borderWidth: 2,
-          borderColor: colors.navyDark,
-          backgroundColor: colors.coral,
-        }}
+        accessibilityLabel={t('notFound.back')}
+        onPress={() => router.replace('/')}
+        className="mt-6 px-8 py-3.5 rounded-2xl"
+        style={{ backgroundColor: colors.coralFill }}
       >
-        <Text className="text-base font-bold" style={{ color: colors.surfaceLowest }}>
-          {t('common.cancel')}
+        <Text className="font-label-lg text-label-lg" style={{ color: colors.onCoral, fontWeight: '800' }}>
+          {t('notFound.back')}
         </Text>
       </Pressable>
     </View>

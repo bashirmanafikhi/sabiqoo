@@ -1,0 +1,17 @@
+# Flow 02 — Surprise-me opens the deed sheet; mark done from the sheet.
+name: "02 Surprise sheet mark done"
+appId: com.bashirmanafikhi.sabiqoo
+---
+- launchApp:
+      clearState: true
+- assertVisible: "Sabiqoo"
+- tapOn:
+      id: "random-button"
+- assertVisible: "I did it!"
+- tapOn:
+      id: "sheet-done-pressable"
+- assertVisible: "Done today"
+- takeScreenshot: sheet-done
+- tapOn:
+      id: "sheet-close"
+- assertVisible: "Sabiqoo"

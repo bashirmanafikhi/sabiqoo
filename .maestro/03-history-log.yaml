@@ -1,0 +1,14 @@
+# Flow 03 — A checked deed lands in the History tab under Today.
+name: "03 History shows the day log"
+appId: com.bashirmanafikhi.sabiqoo
+---
+- launchApp:
+      clearState: true
+- assertVisible: "Sabiqoo"
+- tapOn:
+      id: "deed-check-ch-sadaqah-little"
+- assertVisible: "Mashallah! ✨"
+- tapOn: "History"
+- assertVisible: "Today"
+- assertVisible: "Give charity, even a little"
+- takeScreenshot: history-today
